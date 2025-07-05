@@ -1,6 +1,7 @@
 # $Id: makefile 243 2024-04-06 10:34:40Z rishi $
 builddir=build
-file=main_v2_aml_format
+file=main_v2_aml_1p
+# file=main_v2_aml_5p
 # file=elsarticle-template-harv
 
 $(shell mkdir -p $(builddir))

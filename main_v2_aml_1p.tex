@@ -1,5 +1,5 @@
 % AML期刊elsarticle模板规范
-\documentclass[5p,10pt]{elsarticle}
+\documentclass[1p]{elsarticle}
 % \documentclass[final,1p,times,twocolumn,authoryear]{elsarticle}
 % 必要宏包
 \usepackage{amssymb}
@@ -76,7 +76,8 @@ Split quaternion matrix \sep QR decomposition \sep Permutation matrix \sep Upper
 \section{Introduction}
 In 1849, James Cockle \cite{Cockle1849} introduced the concept of split quaternion algebra over the real numbber field $\mathbb{R}$,   which can be described by the following rules:
 \begin{equation*}
-    \mathbb{H}_s = \left\{ a_0 + a_1 i + a_2 j + a_3 k \ \bigg| \ i^2 = -1,\ j^2 = k^2 = 1,\ ijk = 1,\ a_0, a_1, a_2, a_3 \in \mathbb{R} \right\}
+    \small
+    \mathbb{H}_s = \left\{ a_0 + a_1 i + a_2 j + a_3 k \ \bigg| i^2 = -1,\ j^2 = k^2 = 1, \ ijk = 1, \ a_0, a_1, a_2, a_3 \in \mathbb{R} \right\} 
 \end{equation*} 
 $\mathbb{H}_s$ is a four dimensional commutative algebra over $\mathbb{R}$ and contains zero divisors. 
 Split quaternion matrices have found applications in quantum mechanics, electromagnetism and signal processing (see, e.g., \cite{Gog2022},\cite{Hasebe2010},\cite{Le2022},
@@ -85,8 +86,8 @@ Split quaternion matrices have found applications in quantum mechanics, electrom
 To address the above problem, we constructively prove the existence of QR decomposition for split quaternion matrices, and we propose a novel and efficient algorithm for computing this QR decomposition.  To validate the efficiency  of our algorithm, we provide the experimental results in terms of speed and accuracy.
 
 \section{Preliminaries}
-For any split quaternion matrix \({A}=A_{0}+A_{1}i + A_{2}j + A_{3}k \in\mathbb{H}_{s}^{m\times n}\), where \(A_{i}\in\mathbb{R}^{m\times n}, i\in\{0,1,2,3\}\), its transpose, conjugate, conjugate transpose, i-conjugate, and i-conjugate transpose are  denoted by 
- \({A}^T = A_0^T + A_1^Ti + A_2^Tj + A_3^Tk,\bar{{A}} = A_0 - A_1i - A_2j - A_3k, {A}^* = A_0^T - A_1^Ti - A_2^Tj - A_3^Tk,\) and \(\tilde{{A}} = A_0 - A_1i + A_2j + A_3k,{A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk\), respectively.
+For any split quaternion matrix ${A}=A_{0}+A_{1}i + A_{2}j + A_{3}k \in\mathbb{H}_{s}^{m\times n}$, where $A_{i}\in\mathbb{R}^{m\times n}, i\in\{0,1,2,3\}$, its transpose, conjugate, conjugate transpose, i-conjugate, and i-conjugate transpose are  denoted by 
+ ${A}^T = A_0^T + A_1^Ti + A_2^Tj + A_3^Tk,\bar{{A}} = A_0 - A_1i - A_2j - A_3k, {A}^* = A_0^T - A_1^Ti - A_2^Tj - A_3^Tk,$ and $\tilde{{A}} = A_0 - A_1i + A_2j + A_3k,{A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively.
 
 The real representation matrix of a split quaternion matrix is presented as \cite{Gang2024}:
 \begin{equation}\label{eq:2.1}
@@ -94,22 +95,35 @@ The real representation matrix of a split quaternion matrix is presented as \cit
 \end{equation}
 which has the properties
 \begin{equation}\label{eq:2.2}
-    (A + B)^\sigma = A^\sigma + B^\sigma, \quad (AC)^\sigma = A^\sigma C^\sigma, \quad (a A)^\sigma = a A^\sigma, \ (tA^H)^\sigma = (A^\sigma)^H,
+\begin{aligned}
+    (A + B)^\sigma = A^\sigma + B^\sigma, \quad (AC)^\sigma = A^\sigma C^\sigma, 
+    (a A)^\sigma = a A^\sigma, \quad (tA^H)^\sigma = (A^\sigma)^H
+\end{aligned}
 \end{equation}
-where $A, B \in \mathbb{H}_s^{m \times n}$, $C \in \mathbb{H}_s^{n \times p}$, $a \in \mathbb{R}$.
+where $A, B \in \mathbb{H}_s^{m \times n}$, $C \in \mathbb{H}_s^{n \times p}$, $a \in \mathbb{R}$. 
+
+Conversely, for any real matrix $B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix} \in \mathbb{R}^{2m \times 2n}$, $B_{ts} \in \mathbb{R}^{m \times n}$, $t, s = 1, 2$, one can construct a corresponding split quaternion matrix $A$ as follows \cite{TJiang2015}:
+\begin{equation}\label{eq:2.3}
+    \begin{aligned}
+    A = \frac{B_{11} + B_{22}}{2} + \frac{B_{21} - B_{12}}{2}i 
+        + \frac{B_{11} - B_{22}}{2}j + \frac{B_{21} + B_{12}}{2}k.
+    \end{aligned}
+    \end{equation}
+From equation \eqref{eq:2.1}, we have ${A}^\sigma = B$. 
+That is,  $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$ \cite{Gang2024}.
 
 Furthermore,  $A$ is called unitary if $AA^H = A^H A = I$. We can verify that $A$ is unitary if and only if  $A^\sigma$ is  orthogonal (\cite{TJiang2018}).
- The Frobenius norm of $A$ is defined as: $ \| A \|_F \equiv \frac{1}{\sqrt{2}} \| A^\sigma \|_F = \sqrt{\| A_0 \|_F^2 + \| A_1 \|_F^2 + \| A_2 \|_F^2 + \| A_3 \|_F^2}.$ When $U, V$ are unitary, $U^\sigma$ and $V^\sigma$ are orthogonal, which will not change the Frobenius norm  of $A^\sigma$. Hence
-$\|UAV\|_F = \frac{1}{\sqrt{2}} \|(UAV)^\sigma\|_F 
-= \frac{1}{\sqrt{2}} \|U^\sigma A^\sigma V^\sigma\|_F
-=\frac{1}{\sqrt{2}} \|A^\sigma\|_F
-= \|A\|_F.$
-
-For any real matrix $B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix} \in \mathbb{R}^{2m \times 2n}$, $B_{ts} \in \mathbb{R}^{m \times n}$, $t, s = 1, 2$, one can construct a corresponding split quaternion matrix $A$ as follows \cite{TJiang2015}:
-\begin{equation}\label{eq:2.3}
-{A} = \frac{B_{11} + B_{22}}{2} + \frac{B_{21} - B_{12}}{2}i + \frac{B_{11} - B_{22}}{2}j + \frac{B_{21} + B_{12}}{2}k.
-\end{equation}
-From equation \eqref{eq:2.1}, we have ${A}^\sigma = B$. 
+ The Frobenius norm of $A$ is defined as: 
+ \begin{align*}
+     \| A \|_F \equiv \frac{1}{\sqrt{2}} \| A^\sigma \|_F = \sqrt{\| A_0 \|_F^2 + \| A_1 \|_F^2 + \| A_2 \|_F^2 + \| A_3 \|_F^2}.
+\end{align*}
+  When $U, V$ are unitary, $U^\sigma$ and $V^\sigma$ are orthogonal, which will not change the Frobenius norm  of $A^\sigma$. Hence
+\begin{align*}
+\|UAV\|_F = \frac{1}{\sqrt{2}} \|(UAV)^\sigma\|_F 
+= \frac{1}{\sqrt{2}} \|U^\sigma A^\sigma V^\sigma\|_F 
+= \frac{1}{\sqrt{2}} \|A^\sigma\|_F 
+= \|A\|_F.
+\end{align*}
 
 \section{QR Decomposition of Split Quaternion matrix}
 In this section, we prove the QR decomposition for split quaternion matrices through construction, and based on this, we propose an efficient algorithm.
@@ -125,7 +139,7 @@ R_4 = \begin{bmatrix}
 \end{equation}
 and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m \times n$.
 
-To achieve the special decomposition \eqref{splitqr},  we will first figure out how to transform an upper triangular matrix $R$ into $R_4$ through permutation transformations, as depicted in Figure 1.
+To achieve the special decomposition \eqref{splitqr},  we will first figure out how to transform an upper triangular matrix $R$ into $R_4$ through permutation transformations, as depicted in Figure below.
 \begin{figure}[htbp]
     % \begin{minipage}[htbp]{0.45\textwidth}
         \centering
@@ -153,7 +167,8 @@ to demonstrate.
 
 By performing the following swaps in matrix $R_2$: Replace the odd rows (1, 3, 5) sequentially with the first three rows. Replace the even rows (2, 4, 6) sequentially with the last three rows. Replace the odd columns (1, 3, 5) sequentially with the first three columns. Replace the even columns (2, 4, 6) sequentially with the last three columns. We can obtain the following  resulting matrix:
 
-\[R_4 = \begin{bmatrix}
+\begin{equation*}
+R_4 = \begin{bmatrix}
 \begin{array}{ccc:ccc}
  r_{11} & r_{13} & r_{15} & r_{12} & r_{14} & r_{16}\\
  0      & r_{33} & r_{35} & 0      & r_{34} & r_{36}\\
@@ -165,8 +180,41 @@ By performing the following swaps in matrix $R_2$: Replace the odd rows (1, 3, 5
 \end{array}
 \end{bmatrix}=\begin{bmatrix}
     R_{11} & R_{12}\\R_{21} & R_{22}
-\end{bmatrix}.
-\]
+\end{bmatrix}
+\end{equation*}
+
+\begin{algorithm}[htbp]
+    \caption{Matrix Permutation Algorithm} \label{alg:Permutation}
+    \textbf{Function:} $B=\text{Permutation}(A,\text{flag})$\\	
+    \textbf{Input:}  $ A \in \mathbb{R}^{k \times 2n}$, where flag=0 represents the first submatrix and flag=1 represents the second submatrix.\\
+    \textbf{Output:} $B \in \mathbb{R}^{k \times 2n}$ .
+\begin{itemize}
+    \item[\textbf{Step 1}]\text{ Recursive stop condition:}\\
+        \text{if} $k=2$ \quad return $B=A$;
+    \item[\textbf{Step 2}] Initialization:\\
+        $k2 = \text{floor}((k+1)/2)$;\\
+        $k3 = \text{floor}(k2/2)$;
+    \item[\textbf{Step 3}] Add zero rows:\\
+        if $\text{mod}(k, 2)=1$ \\
+        if flag=1 \quad $A = [\text{zeros}(1, \text{size}(A, 2)); A]$;\\
+        else  $A = [A; \text{zeros}(1, \text{size}(A, 2))]$;
+    \item[\textbf{Step 4}] Perform swapping:\\
+       for $i=1:k3$\\
+       if $\text{mod}(k2, 2)=0$ \quad
+        $A= \text{swap}(A,2*i,k2+2*(i-1)+1)$;\\
+       else
+        $A= \text{swap}(A,2*i,k2+2*(i-1)+2)$;
+    \item[\textbf{Step 5}] Recursive execution:\\
+       $A(1:k2, :) = \text{Permutation}(A(1:k2, :), 0)$;\\
+       $A(k2+1:\text{end}, :) = \text{Permutation}(A(k2+1:\text{end}, :), 1)$;
+    \item[\textbf{Step 6}] Remove zero rows: \\
+       if $\text{mod}(k, 2)=1$ \\
+       if flag=1 \quad $B = A(2:\text{end}, :)$;\\
+       else $B = A(1:\text{end}-1, :)$;
+    \item[\textbf{Step 7}] return $B=A$;
+\end{itemize}
+\end{algorithm}
+
 To obtain the matrix $P$ for $R \in \mathbb{R}^{2m \times 2n}$, we established Algorithm \ref{alg:Permutation}. When the input is $A=I$ and $flag=0$, we can obtain the permutation matrix $P$, see \eqref{p}. The above process can also be applied to non-square matrices. It can be expressed as:
 \begin{equation}
     P_{m} R P_{n}^T = \begin{bmatrix} R_{11} & R_{12}\\R_{21}& R_{22}\end{bmatrix},\label{eq:Rn}
@@ -185,37 +233,6 @@ where
         \end{bmatrix}_{2k \times 2k}
 \end{equation}
 is a permutation matrix.
-\begin{algorithm}[htbp]
-        \caption{Matrix Permutation Algorithm} \label{alg:Permutation}
-        \textbf{Function:} $B=\text{Permutation}(A,\text{flag})$\\	
-        \textbf{Input:}  $ A \in \mathbb{R}^{k \times 2n}$, where flag=0 represents the first submatrix and flag=1 represents the second submatrix.\\
-        \textbf{Output:} $B \in \mathbb{R}^{k \times 2n}$ .
-    \begin{itemize}
-        \item[\textbf{Step 1}]\text{ Recursive stop condition:}\\
-            \text{if} $k=2$ \quad return $B=A$;
-        \item[\textbf{Step 2}] Initialization:\\
-            $k2 = \text{floor}((k+1)/2)$;\\
-            $k3 = \text{floor}(k2/2)$;
-        \item[\textbf{Step 3}] Add zero rows:\\
-            if $\text{mod}(k, 2)=1$ \\
-            if flag=1 \quad $A = [\text{zeros}(1, \text{size}(A, 2)); A]$;\\
-            else  $A = [A; \text{zeros}(1, \text{size}(A, 2))]$;
-        \item[\textbf{Step 4}] Perform swapping:\\
-           for $i=1:k3$\\
-           if $\text{mod}(k2, 2)=0$ \quad
-            $A= \text{swap}(A,2*i,k2+2*(i-1)+1)$;\\
-           else
-            $A= \text{swap}(A,2*i,k2+2*(i-1)+2)$;
-        \item[\textbf{Step 5}] Recursive execution:\\
-           $A(1:k2, :) = \text{Permutation}(A(1:k2, :), 0)$;\\
-           $A(k2+1:\text{end}, :) = \text{Permutation}(A(k2+1:\text{end}, :), 1)$;
-        \item[\textbf{Step 6}] Remove zero rows: \\
-           if $\text{mod}(k, 2)=1$ \\
-           if flag=1 \quad $B = A(2:\text{end}, :)$;\\
-           else $B = A(1:\text{end}-1, :)$;
-        \item[\textbf{Step 7}] return $B=A$;
-    \end{itemize}
-\end{algorithm}
 
 After completing the above steps, we can now proceed to implement the decomposition \eqref{splitqr}.
 First, perform the QR decomposition to the real matrix $P_m^TA^\sigma P_{n}$:
@@ -226,12 +243,73 @@ Multiplying both sides of the equation by $P_m$ on the left and $P_n^T$ on the r
 \[A^\sigma=P_m\tilde{Q}P_m^T R_4.\]
 Since $P_m$ is a permutation matrix, it is also an orthogonal matrix. Therefore, the product of matrices, $P_mQP_m^T$, is also an orthogonal matrix, then we get our required special decomposition $A^\sigma=\hat{Q}R_4,$ where $\hat{Q}=P_m\tilde{Q}P_m^T$ is orthogonal, and $R_4$ is in the form of \eqref{r4}.
 
+\begin{algorithm}[htbp]
+    \caption{Matrix Permutation Optimization Algorithm}
+    \label{alg:Permutation Optimization}
+    \textbf{Function:} $B=\text{PermutationOpt}(A,t)$\\
+    \textbf{Input:} \indent  $ A\in \mathbb{R}^{2m\times 2n}$, $t$ is 0 or 1. \\
+    {\textbf{Output:}}  $B \in\mathbb{R}^{2m\times 2n}$, $B=PA$ when t is 0, and $B=P^TA$ when t is 1.
+          \begin{algorithmic}
+          \raggedright 
+          \item[] if $t == 1$\\
+          \quad for $i = 1:m$\\
+          \qquad $B(2*i-1, :) = A(i, :);$\\
+          \qquad $B(2*i, :) = A(m+i, :);$\\
+          \quad end\\
+          \noindent else\\
+          \quad for $i = 1:m$\\
+          \qquad $B(i, :) = A(2*i-1, :);$\\
+          \qquad $B(m+i, :) = A(2*i, :);$\\
+          \quad end\\
+          end
+          \end{algorithmic}
+\end{algorithm}
+
 \textbf{Step 2:} Using equation \eqref{eq:2.3}, construct the matrix $R$ such that $R^\sigma=R_4:$
 $$
 R = \frac{R_{11} + R_{22}}{2} + \frac{R_{21} - R_{12}}{2}i + \frac{R_{11} - R_{22}}{2}j + \frac{R_{21} + R_{12}}{2}k.
 $$
 Since $R_{11}, R_{12}, R_{21}, R_{22}$ are upper triangular, this ensures the constructed split quaternion matrix $R$ is also upper triangular.
 
+
+\begin{algorithm}[htbp] 
+    \caption{Compute the QR of Split Quaternion Matrix \(A\)}
+    \label{alg:QR}
+    \textbf{Function:} $[Q, R]=\text{Split-QR}(A)$\\
+    \textbf{Input:} \(A = A_0 + A_1 i + A_2 j + A_3 k \in \mathbb{H}_s^{m\times n}\). \\
+    {\textbf{Output:}  }  Unitary matrix \(Q \in \mathbb{H}_s^{m\times m}\), upper triangular matrix \(R \in \mathbb{H}_s^{m\times n}\), satisfying \(Q  R = A\) 
+\begin{itemize}
+    \item[\textbf{Step 1}] Real representation of $A$: \\
+    \(A^\sigma = \begin{bmatrix}
+        A_0 + A_2 & -A_1 + A_3 \\ 
+        A_1 + A_3 & A_0 - A_2
+        \end{bmatrix} \in \mathbb{R}^{2m\times 2n}\);
+     \item[\textbf{Step 2}] Compute \(\hat{A} = P_{m}^T A^\sigma P_{n}\): \\
+     $\hat{A}=\text{PermutationOpt}(A^\sigma,1);$ \\
+     $\hat{A}=\text{PermutationOpt}(\hat{A}',1),\hat{A}=\hat{A}';$
+    \item[\textbf{Step 3}] \([Q,R] = \text{qr}(\hat{A})\);
+    \item[\textbf{Step 4}] Compute \(R^\sigma = P_{m}RP_{n}^T\), \(Q^\sigma = P_{m}QP_{m}^T\): \\
+    $R=\text{PermutationOpt}(R,0); \\
+    R=\text{PermutationOpt}(R',0);R^\sigma=R';$ \\
+    $Q=\text{PermutationOpt}(Q,0); \\
+    Q=\text{PermutationOpt}(Q',0);Q^\sigma=Q';$
+    \item[\textbf{Step 5}] Construct matrix Q, R: \\
+    $
+        Q_0 = (Q^\sigma(1\!:\!m,1\!:\!m) + Q^\sigma(m+1\!:\!2m,m+1\!:\!2m))/2; \\
+        Q_1 = (Q^\sigma(m+1\!:\!2m,1\!:\!m) - Q^\sigma(1\!:\!m,m+1\!:\!2m))/2; \\
+        Q_2 = (Q^\sigma(1\!:\!m,1\!:\!m) - Q^\sigma(m+1\!:\!2m,m+1\!:\!2m))/2; \\
+        Q_3 = (Q^\sigma(m+1\!:\!2m,1\!:\!m) + Q^\sigma(1\!:\!m,m+1\!:\!2m))/2; \\
+        R_0 = (R^\sigma(1\!:\!m,1\!:\!n) + R^\sigma(m+1\!:\!2m,n+1\!:\!2n))/2; \\
+        R_1 = (R^\sigma(m+1\!:\!2m,1\!:\!n) - R^\sigma(1\!:\!m,n+1\!:\!2n))/2; \\
+        R_2 = (R^\sigma(1\!:\!m,1\!:\!n) - R^\sigma(m+1\!:\!2m,n+1\!:\!2n))/2; \\
+        R_3 = (R^\sigma(m+1\!:\!2m,1\!:\!n) + R^\sigma(1\!:\!m,n+1\!:\!2n))/2;
+    $
+    \item[\textbf{Step 6}] Return: \\
+        $Q = Q_0 + Q_1i + Q_2j + Q_3k;$ \\
+        $R = R_0 + R_1i + R_2j + R_3k;$
+
+\end{itemize}
+\end{algorithm}
 
 Additionally, construct the matrix $Q$ such that $Q^\sigma=\hat{Q}:$
 $$
@@ -255,57 +333,8 @@ From the process described above,  any split quaternion matrix can be decomposed
 
 % {\color{red} Is Algorithm 1 is well-known??? or special one for Algorithm 2?}
 To reduce the computational cost of multiplication operations on $\hat{A}, R, Q$, we designed Algorithm \ref{alg:Permutation Optimization}, which avoids multiplication operations.
-\linespread{1.1}
-    \begin{algorithm}[htbp]
-    \caption{Matrix Permutation Optimization Algorithm}
-    \label{alg:Permutation Optimization}
-    \textbf{Function:} $B=\text{PermutationOpt}(A,t)$\\
-    \textbf{Input:} \indent  $ A\in \mathbb{R}^{2m\times 2n}$, $t$ is 0 or 1. \\
-    {\textbf{Output:}}  $B \in\mathbb{R}^{2m\times 2n}$, $B=PA$ when t is 0, and $B=P^TA$ when t is 1.
-          \begin{algorithmic}
-          \raggedright 
-          \item[] if $t == 1$\\
-          \quad for $i = 1:m$\\
-          \qquad $B(2*i-1, :) = A(i, :);$\\
-          \qquad $B(2*i, :) = A(m+i, :);$\\
-          \quad end\\
-          \noindent else\\
-          \quad for $i = 1:m$\\
-          \qquad $B(i, :) = A(2*i-1, :);$\\
-          \qquad $B(m+i, :) = A(2*i, :);$\\
-          \quad end\\
-          end
-          \end{algorithmic}
-\end{algorithm}
 
-\linespread{1.1}
-\begin{algorithm}[htbp] 
-        \caption{Compute the QR of Split Quaternion Matrix \(A\)}
-        \label{alg:QR}
-        \textbf{Function:} $[Q, R]=\text{Split-QR}(A)$\\
-        \textbf{Input:} \(A = A_0 + A_1 i + A_2 j + A_3 k \in \mathbb{H}_s^{m\times n}\). \\
-        {\textbf{Output:}  }  Unitary matrix \(Q \in \mathbb{H}_s^{m\times m}\), upper triangular matrix \(R \in \mathbb{H}_s^{m\times n}\), satisfying \(Q  R = A\) 
-    \begin{itemize}
-        \item[\textbf{Step 1}] Real representation of $A$: \(A^\sigma = \begin{bmatrix}
-            A_0 + A_2 & -A_1 + A_3 \\ 
-            A_1 + A_3 & A_0 - A_2
-            \end{bmatrix} \in \mathbb{R}^{2m\times 2n}\);
-         \item[\textbf{Step 2}] Compute \(\hat{A} = P_{m}^T A^\sigma P_{n}\): \\$\hat{A}=\text{PermutationOpt}(A^\sigma,1),$ $\hat{A}=\text{PermutationOpt}(\hat{A}',1),\hat{A}=\hat{A}';$
-        \item[\textbf{Step 3}] \([Q,R] = \text{qr}(\hat{A})\);
-        \item[\textbf{Step 4}] Compute \(R^\sigma = P_{m}RP_{n}^T\), \(Q^\sigma = P_{m}QP_{m}^T\):\\
-        $R=\text{PermutationOpt}(R,0),R=\text{PermutationOpt}(R',0),R^\sigma=R'$\\
-        $Q=\text{PermutationOpt}(Q,0),Q=\text{PermutationOpt}(Q',0),Q^\sigma=Q'.$
-        \item[\textbf{Step 5}] \(Q_0 = (Q^\sigma(1:m,1:m) + Q^\sigma(m+1:2m,m+1:2m))/2\),
-           \(Q_1 = (Q^\sigma(m+1:2m,1:m) - Q^\sigma(1:m,m+1:2m))/2\),
-            \(Q_2 = (Q^\sigma(1:m,1:m) - Q^\sigma(m+1:2m,m+1:2m))/2\),
-            \(Q_3 = (Q^\sigma(m+1:2m,1:m) + Q^\sigma(1:m,m+1:2m))/2\),
-            \(R_0 = (R^\sigma(1:m,1:n) + R^\sigma(m+1:2m,n+1:2n))/2\),
-            \(R_1 = (R^\sigma(m+1:2m,1:n) - R^\sigma(1:m,n+1:2n))/2\),
-            \(R_2 = (R^\sigma(1:m,1:n) - R^\sigma(m+1:2m,n+1:2n))/2\),
-            \(R_3 = (R^\sigma(m+1:2m,1:n) + R^\sigma(1:m,n+1:2n))/2\);
-        \item[\textbf{Step 6}] \(Q = Q_0 + Q_1i + Q_2j + Q_3k\),\quad\(R = R_0 + R_1i + R_2j + R_3k\),
-        \end{itemize}
-\end{algorithm}
+
 \textbf{Complexity Analysis:}
 {Complexity Analysis:} For a split quaternion matrix $A = A_0 + A_1i + A_2j + A_3k \in \mathbb{H}_s^{m \times n}$, the computational complexity of Algorithm \ref{alg:QR} is dominated by three components:  
 
@@ -323,6 +352,7 @@ The QR decomposition of $\hat{A} \in \mathbb{R}^{2m \times 2n}$ using Householde
 $$
 \underbrace{(4mn)}_{\text{Real Rep.}} + \underbrace{(8m+4n)}_{\substack{\text{Permutation} \\ \text{(optimized)}}} + \underbrace{(16(mn^2-\frac{n^3}{3}))}_{\text{QR}} \approx \boxed{(16(mn^2-\frac{n^3}{3}))}
 $$  
+
 
 \section{Numerical Examples}
 In this section,  we will use the proposed  Algorithm 2 to compute the QR decomposition for split quaternion matrices and apply it to solving a matrix equation.
@@ -375,7 +405,8 @@ A =
 -1 & -2 & 4 \\
 -5 & -8 & -5 \\
 -4 & 0 & 6
-\end{bmatrix} i +
+\end{bmatrix} i 
++ 
 \begin{bmatrix}
 -9 & -6 & -8 \\
 -2 & -10 & -5 \\
@@ -386,8 +417,10 @@ A =
 2 & -6 & 0 \\
 8 & 0 & -5
 \end{bmatrix} k,
-\\
-\dot{B} =
+\end{align*}
+
+\begin{align*}
+B =
 \begin{bmatrix}
 -9 & -10 & 10 \\
 -1 & 10 & 6 \\
@@ -397,7 +430,8 @@ A =
 4 & 1 & -6 \\
 4 & -6 & -3 \\
 3 & 6 & 8
-\end{bmatrix} i +
+\end{bmatrix} i 
++
 \begin{bmatrix}
 7 & 2 & 2 \\
 -2 & 9 & -4 \\
@@ -408,13 +442,15 @@ A =
 8 & 5 & -7 \\
 -10 & -7 & -4
 \end{bmatrix} k.
-\\
 \end{align*}
 \end{example}  
 First, perform QR decomposition on $A$ to obtain $Q$ and $R:$
+% \setlength{\jot}{5pt}
+% \setlength{\arraycolsep}{1pt}
+% {\footnotesize
 \begin{align*}
 Q =
-\begin{bmatrix}
+& \begin{bmatrix}
 -0.514 & -0.047 & -0.344 \\
 -0.126 & -0.411 & -0.041 \\
 -0.436 & -0.429 & -0.099
@@ -423,8 +459,9 @@ Q =
 -0.363 & 0.479 & 0.122 \\
 0.077 & -0.458 & -0.100 \\
 0.383 & -0.194 & 0.138
-\end{bmatrix} i \\+
-\begin{bmatrix}
+\end{bmatrix} i \\
++ 
+& \begin{bmatrix}
 -0.236 & -0.062 & -0.155 \\
 -0.105 & 0.031 & 0.403 \\
 0.262 & 0.178 & -0.296
@@ -435,7 +472,7 @@ Q =
 -0.152 & 0.291 & -0.343
 \end{bmatrix} k,\\
 R =
-\begin{bmatrix}
+& \begin{bmatrix}
 -3.041 & 3.419 & 10.927 \\
 0 & 6.061 & 6.456 \\
 0 & 0 & 7.714
@@ -444,8 +481,9 @@ R =
 -1.443 & 8.617 & 1.053 \\
 0 & 1.847 & -2.947 \\
 0 & 0 & -5.025
-\end{bmatrix} i \\+
-\begin{bmatrix}
+\end{bmatrix} i \\
++ 
+& \begin{bmatrix}
 20.361 & 5.876 & 6.740 \\
 0 & 14.697 & 6.795 \\
 0 & 0 & 0.815
@@ -455,7 +493,8 @@ R =
 0 & -1.847 & -1.528 \\
 0 & 0 & 5.025
 \end{bmatrix} k.
-\end{align*}\\
+\end{align*}
+% }
 Thus, the equation can be rewritten as
 \begin{equation}
     QRX = B.\label{eq:example1}
@@ -465,7 +504,7 @@ multiplying both sides of \eqref{eq:example1} by \(Q^H\) from the left yields \(
 where
 \begin{align*}
 \hat{B} =
-\begin{bmatrix}
+& \begin{bmatrix}
 4.981 & 6.383 & 8.076 \\
 -2.019 & -1.922 & -1.440 \\
 11.356 & 10.929 & -9.652
@@ -475,7 +514,7 @@ where
 1.152 & 11.947 & -2.239 \\
 -3.761 & 0.482 & -0.749
 \end{bmatrix} i \\+
-\begin{bmatrix}
+& \begin{bmatrix}
 -6.136 & -7.249 & -9.693 \\
 0.310 & -4.646 & 0.574 \\
 1.391 & -2.620 & -3.994
@@ -489,7 +528,7 @@ where
 Note that \(R\) is an upper triangular matrix, thus   \(RX = Q^HB\triangleq\hat{B}\)  can be solved using back substitution:
  \begin{align*}
 X =
-\begin{bmatrix}
+& \begin{bmatrix}
 -1.082 & -0.797 & 1.407 \\
 -0.316 & -0.028 & 0.749 \\
 1.846 & 0.845 & -2.243
@@ -499,7 +538,7 @@ X =
 -0.423 & -0.961 & 1.907 \\
 0.349 & 1.315 & -0.403
 \end{bmatrix} i \\+
-\begin{bmatrix}
+& \begin{bmatrix}
 -0.456 & -0.123 & 1.793 \\
 -1.222 & -0.449 & 1.810 \\
 0.402 & -1.119 & -1.423
