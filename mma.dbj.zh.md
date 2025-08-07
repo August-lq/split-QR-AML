@@ -220,7 +220,7 @@
 > %<<AUTHOR NAMES:
 > % ed-au,%: Full, surname last (John Frederick Smith)
 > % nm-revf,%: Full, surname first (Smith, John Frederick)
->   nm-init,ed-au,%: Initials + surname (J. F. Smith)
+> % nm-init,ed-au,%: Initials + surname (J. F. Smith)
 > % nm-rev,%: Surname + initials (Smith, J. F.)
 > % nm-rv,%: Surname + dotless initials (Smith J F)
 > % nm-rvvc,%: Surname + comma + spaceless initials (Smith, J.F.)
