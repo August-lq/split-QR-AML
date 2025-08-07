@@ -4,6 +4,8 @@ builddir=build
 $(shell mkdir -p $(builddir))
 
 all: 
+	$(MAKE) pdf
+	$(MAKE) pdf
 
 clean:
 	rm -rf $(builddir)

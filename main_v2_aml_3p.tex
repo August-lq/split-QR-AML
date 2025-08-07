@@ -38,8 +38,6 @@
 
 \numberwithin{equation}{section}
 
-\biboptions{numbers,sort&compress}
-
 \begin{document}
 
 %-------------------- FRONTMATTER --------------------
@@ -83,33 +81,36 @@ In 1849, James Cockle \cite{Cockle1849} introduced the concept of split quaterni
     \mathbb{H}_s = \left\{ a_0 + a_1 i + a_2 j + a_3 k \ \bigg| i^2 = -1,\ j^2 = k^2 = 1, \ ijk = 1, \ a_0, a_1, a_2, a_3 \in \mathbb{R} \right\} 
 \end{equation*} 
 $\mathbb{H}_s$ is a four dimensional commutative algebra over $\mathbb{R}$ and contains zero divisors. 
-Split quaternion matrices have found applications in quantum mechanics, electromagnetism and signal processing (see, e.g.,\cite{Gog2022, Hasebe2010, Le2022, Z2022, Wang2023}). In the past decades, many researches  have been done in studying the algebraic properties of split quaternions (see, e.g., \cite{Abłamowicz2020, Yasemin2012, TJiang2015, Jiang2018, TJiang2018, Zhuo2020, Yang2020,  Xin2019, mma, wang, Wang2021, Gang2024, yuan, Zhang2015}). For instance, \cite{Jiang2018, TJiang2018} respectively solved the eigenvalue problems and the solutions to the Schrödinger equation; \cite{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \cite{wang} solved the classical system of matrix equations; \cite{Wang2021} proposed a fast algorithm based on LDU decomposition;
-\cite{Gang2024}  proposed the SVD decomposition theory and an efficient algorithm for decomposing quaternion matrices. However, the existing research has yet to fully address the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
-
-
+Split quaternion matrices have found applications in quantum mechanics, electromagnetism and signal processing (see, e.g.,\cite{Gog2022},\cite{Hasebe2010},\cite{Le2022},\cite{Z2022},\cite{Wang2023}). In the past decades, many researches  have been done in studying the algebraic properties of split quaternions (see, e.g., \cite{Abłamowicz2020},\cite{Yasemin2012},\cite{TJiang2015}-\cite{TJiang2018},\cite{Zhuo2020}-\cite{Xin2019},\cite{mma},\cite{wang},\cite{Wang2021}-\cite{Zhang2015}). For instance, \cite{Jiang2018}-\cite{TJiang2018} respectively solved the eigenvalue problems and the solutions to the Schrödinger equation; \cite{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \cite{wang} solved the classical system of matrix equations; \cite{Wang2021} proposed a fast algorithm based on LDU decomposition;  \cite{Gang2024}  proposed the SVD decomposition theory and an efficient algorithm for decomposing quaternion matrices. However, the existing research has yet to fully address the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
 
 To address the above problem, we constructively prove the existence of QR decomposition for split quaternion matrices, and we propose a novel and efficient algorithm for computing this QR decomposition.  To validate the efficiency  of our algorithm, we provide the experimental results in terms of speed and accuracy.
 
 \section{Preliminaries}
 For any split quaternion matrix ${A}=A_{0}+A_{1}i + A_{2}j + A_{3}k \in\mathbb{H}_{s}^{m\times n}$, where $A_{i}\in\mathbb{R}^{m\times n}, i\in\{0,1,2,3\}$, its transpose, conjugate, conjugate transpose, i-conjugate, and i-conjugate transpose are  denoted by 
- ${A}^T = A_0^T + A_1^Ti + A_2^Tj + A_3^Tk,\bar{{A}} = A_0 - A_1i - A_2j - A_3k, {A}^* = A_0^T - A_1^Ti - A_2^Tj - A_3^Tk,$ and $\tilde{A} = A_0 - A_1i + A_2j + A_3k,{A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively.
+ ${A}^T = A_0^T + A_1^Ti + A_2^Tj + A_3^Tk,\bar{{A}} = A_0 - A_1i - A_2j - A_3k, {A}^* = A_0^T - A_1^Ti - A_2^Tj - A_3^Tk,$ and $\tilde{{A}} = A_0 - A_1i + A_2j + A_3k,{A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively.
 
-Recall that the real representation matrix of a split quaternion matrix ${A}  \in\mathbb{H}_{s}^{m\times n}$ can be presented as:
+The real representation matrix of a split quaternion matrix is presented as \cite{Gang2024}:
 \begin{equation}\label{eq:2.1}
-A^\sigma = \begin{bmatrix} A_0 + A_2 & -A_1 + A_3 \\ A_1 + A_3 & A_0 - A_2 \end{bmatrix} \in \mathbb{R}^{2m \times 2n},
+{A}^\sigma = \begin{bmatrix} A_0 + A_2 & -A_1 + A_3 \\ A_1 + A_3 & A_0 - A_2 \end{bmatrix} \in \mathbb{R}^{2m \times 2n},
 \end{equation}
 which has the properties
 \begin{equation}\label{eq:2.2}
-    (A + B)^\sigma = A^\sigma + B^\sigma, \quad (AC)^\sigma = A^\sigma C^\sigma, \quad (a A)^\sigma = a A^\sigma, \ (tA^H)^\sigma = (A^\sigma)^H,
+\begin{aligned}
+    (A + B)^\sigma = A^\sigma + B^\sigma, \quad (AC)^\sigma = A^\sigma C^\sigma, 
+    (a A)^\sigma = a A^\sigma, \quad (tA^H)^\sigma = (A^\sigma)^H
+\end{aligned}
 \end{equation}
 where $A, B \in \mathbb{H}_s^{m \times n}$, $C \in \mathbb{H}_s^{n \times p}$, $a \in \mathbb{R}$. 
 
-Conversely, for any real matrix $B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix} \in \mathbb{R}^{2m \times 2n}$, $B_{ts} \in \mathbb{R}^{m \times n}$, $t, s = 1, 2$, one can construct a corresponding split quaternion matrix $A$ as follows:
+Conversely, for any real matrix $B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix} \in \mathbb{R}^{2m \times 2n}$, $B_{ts} \in \mathbb{R}^{m \times n}$, $t, s = 1, 2$, one can construct a corresponding split quaternion matrix $A$ as follows \cite{TJiang2015}:
 \begin{equation}\label{eq:2.3}
-{A} = \frac{B_{11} + B_{22}}{2} + \frac{B_{21} - B_{12}}{2}i + \frac{B_{11} - B_{22}}{2}j + \frac{B_{21} + B_{12}}{2}k.
-\end{equation}
+    \begin{aligned}
+    A = \frac{B_{11} + B_{22}}{2} + \frac{B_{21} - B_{12}}{2}i 
+        + \frac{B_{11} - B_{22}}{2}j + \frac{B_{21} + B_{12}}{2}k.
+    \end{aligned}
+    \end{equation}
 From equation \eqref{eq:2.1}, we have ${A}^\sigma = B$. 
-That is,  $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$. We refer to \cite{TJiang2015, Gang2024} for more details.
+That is,  $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$ \cite{Gang2024}.
 
 Furthermore,  $A$ is called unitary if $AA^H = A^H A = I$. We can verify that $A$ is unitary if and only if  $A^\sigma$ is  orthogonal (\cite{TJiang2018}).
  The Frobenius norm of $A$ is defined as: 
@@ -270,6 +271,23 @@ R
 \begin{equation}\label{eq:Rn}
     P_{m} R P_{n}^T = \begin{bmatrix} R_{11} & R_{12}\\R_{21}& R_{22}\end{bmatrix}.
 \end{equation}
+To obtain the matrix $P_k, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, we established Algorithm \ref{alg:Permutation}. When the input is $A=I_{2k \times 2k}$ and $flag=0$, we can obtain the permutation matrix $P_k$:
+
+\begin{equation}\label{p}
+    P_k = \begin{bmatrix} 
+            1 & 0 & 0 & 0 & \cdots & 0 & 0\\ 
+            0 & 0 & 1 & 0 & \cdots & 0 & 0\\ 
+            \vdots & \vdots & \vdots & \vdots &  & \vdots & \vdots\\ 
+            0 & 0 & 0 & 0 & \cdots & 1 & 0 \\
+            0 & 1 & 0 & 0 & \cdots & 0 & 0\\ 
+            0 & 0 & 0 & 1 & \cdots & 0 & 0\\ 
+            \vdots & \vdots & \vdots & \vdots &  & \vdots & \vdots\\ 
+            0 & 0 & 0 & 0 &\cdots & 0 & 1 
+        \end{bmatrix}_{2k \times 2k}
+\end{equation}
+{\color{red} We can see that $P_k$ is a permutation matrix. By proposing this $P_k$, we successfully transform an even-order upper triangular $R$ matrix into an $R_4$ matrix \eqref{r4}.}
+
+
 \begin{algorithm}[htbp]
     \caption{Matrix Permutation Recursive Algorithm} \label{alg:Permutation}
     \begin{algorithmic}
@@ -314,22 +332,6 @@ R
     \End 
     \end{algorithmic}
 \end{algorithm}
-
-To obtain the matrix $P_k, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, we established Algorithm \ref{alg:Permutation}. When the input is $A=I_{2k \times 2k}$ and $flag=0$, we can obtain the permutation matrix $P_k$:
-
-\begin{equation}\label{p}
-\centering
-    P_k = \begin{bmatrix} 
-            1 & 0 & 0 & 0 & \cdots & 0 & 0\\ 
-            0 & 0 & 1 & 0 & \cdots & 0 & 0\\ 
-            \vdots & \vdots & \vdots & \vdots &  & \vdots & \vdots\\ 
-            0 & 0 & 0 & 0 & \cdots & 1 & 0 \\
-            0 & 1 & 0 & 0 & \cdots & 0 & 0\\ 
-            0 & 0 & 0 & 1 & \cdots & 0 & 0\\ 
-            \vdots & \vdots & \vdots & \vdots &  & \vdots & \vdots\\ 
-            0 & 0 & 0 & 0 &\cdots & 0 & 1 
-        \end{bmatrix}_{2k \times 2k}
-\end{equation}
 
 % \begin{algorithm}[htbp]
 %     \caption{Matrix Permutation Algorithm} \label{alg:Permutation}
@@ -396,6 +398,8 @@ Since $P_m$ is a permutation matrix, it is also an orthogonal matrix. Thus, the 
 %           end
 %           \end{algorithmic}
 % \end{algorithm}
+
+
 
 \begin{algorithm}[htbp]
     \caption{Matrix Permutation Optimization Algorithm}
@@ -512,14 +516,6 @@ Since $R_{11}, R_{12}, R_{21}, R_{22}$ are upper triangular, this ensures the co
 % \end{itemize}
 % \end{algorithm}
 
-Additionally, construct the matrix $Q$ such that $Q^\sigma=\widetilde{Q}:$
-$$
-Q = \frac{Q_{11} + Q_{22}}{2} + \frac{Q_{21} - Q_{12}}{2}i + \frac{Q_{11} - Q_{22}}{2}j + \frac{Q_{21} + Q_{12}}{2}k,
-$$
-where  $Q_{11}, 
- Q_{12}, Q_{21}, Q_{22} \in \mathbb{R}^{m \times n}$ are the blocks of the orthogonal matrix $\widetilde{Q} = \begin{bmatrix} Q_{11} & Q_{12} \\ Q_{21} & Q_{22} \end{bmatrix} \in \mathbb{
- R}^{2m \times 2m}$.
- 
 \begin{algorithm}[htbp] 
     \caption{Compute the QR of Split Quaternion Matrix \(A\)}
     \label{alg:QR}
@@ -532,19 +528,23 @@ where  $Q_{11},
             A_0 + A_2 & -A_1 + A_3 \\ 
             A_1 + A_3 & A_0 - A_2
             \end{bmatrix} \in \mathbb{R}^{2m\times 2n}\);
+        \State
         
         \State \% \textbf{Step 2} Compute \(\widehat{A} = P_{m}^T A^\sigma P_{n}\): 
         \State $\widehat{A}=\text{PermutationOpt}(A^\sigma,1);$ 
         \State $\widehat{A}=\text{PermutationOpt}(\widehat{A}',1),\widehat{A}=\widehat{A}';$
+        \State
         
         \State \% \textbf{Step 3} Compute QR:
         \State \([\widehat{Q},\widehat{R}] = \text{qr}(\widehat{A})\);
+        \State
         
         \State \% \textbf{Step 4} Compute \(R^\sigma = P_{m}\widehat{R}P_{n}^T\), \(Q^\sigma =      P_{m}\widehat{Q}P_{m}^T\): 
         \State $\widehat{R}=\text{PermutationOpt}(\widehat{R},0)$;
         \State $\widehat{R}=\text{PermutationOpt}(\widehat{R}',0);R^\sigma=\widehat{R}'$;
         \State $\widehat{Q}=\text{PermutationOpt}(\widehat{Q},0)$;
         \State $\widehat{Q}=\text{PermutationOpt}(\widehat{Q}',0);Q^\sigma=\widehat{Q}'$;
+        \State
         
         \State \% \textbf{Step 5} Construct matrix Q, R:
         \State $Q_0 = (Q^\sigma(1\!:\!m,1\!:\!m) + Q^\sigma(m+1\!:\!2m,m+1\!:\!2m))/2$;
@@ -555,13 +555,22 @@ where  $Q_{11},
         \State $R_1 = (R^\sigma(m+1\!:\!2m,1\!:\!n) - R^\sigma(1\!:\!m,n+1\!:\!2n))/2$;
         \State $R_2 = (R^\sigma(1\!:\!m,1\!:\!n) - R^\sigma(m+1\!:\!2m,n+1\!:\!2n))/2$;
         \State $R_3 = (R^\sigma(m+1\!:\!2m,1\!:\!n) + R^\sigma(1\!:\!m,n+1\!:\!2n))/2$;
-
-        \State \% \textbf{Step 6} Return: 
+        \State
+        
+        \State \% \textbf{Step 6}] Return: 
         \State $Q = Q_0 + Q_1i + Q_2j + Q_3k$;
         \State $R = R_0 + R_1i + R_2j + R_3k$;
     \End 
     \end{algorithmic}
 \end{algorithm}
+
+Additionally, construct the matrix $Q$ such that $Q^\sigma=\widetilde{Q}:$
+$$
+Q = \frac{Q_{11} + Q_{22}}{2} + \frac{Q_{21} - Q_{12}}{2}i + \frac{Q_{11} - Q_{22}}{2}j + \frac{Q_{21} + Q_{12}}{2}k,
+$$
+where  $Q_{11}, 
+ Q_{12}, Q_{21}, Q_{22} \in \mathbb{R}^{m \times n}$ are the blocks of the orthogonal matrix $\widetilde{Q} = \begin{bmatrix} Q_{11} & Q_{12} \\ Q_{21} & Q_{22} \end{bmatrix} \in \mathbb{
+ R}^{2m \times 2m}$.
 
 Note that $(Q^H Q)^\sigma = {(Q^H)}^\sigma Q^\sigma = {(Q^\sigma)}^TQ^\sigma = \widetilde{Q}^T\widetilde{Q} = I_{2m}$, indicating that the split quaternion matrix $Q$ remains a unitary matrix.
 Now, $A^\sigma=\widetilde{Q}R_4=Q^\sigma R^\sigma$ implies
@@ -613,9 +622,9 @@ In this section,  we will use the proposed  Algorithm 2 to compute the QR decomp
         \end{cases} \label{eq:example2}
     \end{equation}
 \end{example}
-Here, the MATLAB function  $rand(m,n)$ is used to generate a $m \times n$ real matrix with random elements that fall within the interval [0,1]. All experiments were performed and computed using MATLAB 2024a on a system equipped with an 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz processor, 16.0 GB RAM and Windows 11 Pro. We executed Algorithm \ref{alg:QR} to perform the QR decomposition on $A$, and have calculated the CPU time and the relative error
+Here, the MATLAB function  $rand(m,n)$ is used to generate an $m \times n$ real matrix with random elements that fall within the interval [0,1]. All experiments were performed and computed using MATLAB 2024a on a system equipped with a 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz procssor,16.0 GB RAM and Windows 11 Pro.We executed Algorithm 2 to perform the QR decomposition on $A$, and have computed the CPU time and the relative error
 $\epsilon = \frac{\left\|A - Q R\right\|_{F}}{\|A\|_{F}}.$
-The experimental results from Figure \ref{fig:cpu times} show that Algorithm \ref{alg:Permutation Optimization} performs quite well in both speed and accuracy. 
+The experimental results from Figure \ref{fig:cpu times} show that Algorithm 2 performs quite well in both speed and accuracy. 
 \begin{figure}[htbp]
     \centering
     \begin{minipage}[b]{0.45\textwidth}
@@ -634,11 +643,10 @@ The experimental results from Figure \ref{fig:cpu times} show that Algorithm \re
      \label{fig:cpu times}
 \end{figure}
 
-In the following, we will discuss the application of QR decomposition in solving matrix equations.
+
+Below, we will discuss the application of QR decomposition in solving matrix equation.
 \begin{example}
 Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$, where
-\setlength{\jot}{2pt}
-\setlength{\arraycolsep}{1pt}
 \begin{align*}
 A =
 \begin{bmatrix}
@@ -663,6 +671,7 @@ A =
 8 & 0 & -5
 \end{bmatrix} k,
 \end{align*}
+
 \begin{align*}
 B =
 \begin{bmatrix}
@@ -688,10 +697,10 @@ B =
 \end{bmatrix} k.
 \end{align*}
 \end{example}  
-
-First, perform QR decomposition on $A$ to obtain $Q$ and $R$:
-
-{\footnotesize
+First, perform QR decomposition on $A$ to obtain $Q$ and $R:$
+% \setlength{\jot}{5pt}
+% \setlength{\arraycolsep}{1pt}
+% {\footnotesize
 \begin{align*}
 Q =
 & \begin{bmatrix}
@@ -703,9 +712,9 @@ Q =
 -0.363 & 0.479 & 0.122 \\
 0.077 & -0.458 & -0.100 \\
 0.383 & -0.194 & 0.138
-\end{bmatrix} i
+\end{bmatrix} i \\
 + 
-\begin{bmatrix}
+& \begin{bmatrix}
 -0.236 & -0.062 & -0.155 \\
 -0.105 & 0.031 & 0.403 \\
 0.262 & 0.178 & -0.296
@@ -725,9 +734,9 @@ R =
 -1.443 & 8.617 & 1.053 \\
 0 & 1.847 & -2.947 \\
 0 & 0 & -5.025
-\end{bmatrix} i
+\end{bmatrix} i \\
 + 
-\begin{bmatrix}
+& \begin{bmatrix}
 20.361 & 5.876 & 6.740 \\
 0 & 14.697 & 6.795 \\
 0 & 0 & 0.815
@@ -738,7 +747,7 @@ R =
 0 & 0 & 5.025
 \end{bmatrix} k.
 \end{align*}
-}
+% }
 Thus, the equation can be rewritten as
 \begin{equation}
     QRX = B.\label{eq:example1}
@@ -757,8 +766,8 @@ where
 -1.144 & -7.725 & 6.206 \\
 1.152 & 11.947 & -2.239 \\
 -3.761 & 0.482 & -0.749
-\end{bmatrix} i +
-\begin{bmatrix}
+\end{bmatrix} i \\+
+& \begin{bmatrix}
 -6.136 & -7.249 & -9.693 \\
 0.310 & -4.646 & 0.574 \\
 1.391 & -2.620 & -3.994
@@ -781,8 +790,8 @@ X =
 -1.116 & -0.337 & 0.999 \\
 -0.423 & -0.961 & 1.907 \\
 0.349 & 1.315 & -0.403
-\end{bmatrix} i +
-\begin{bmatrix}
+\end{bmatrix} i \\+
+& \begin{bmatrix}
 -0.456 & -0.123 & 1.793 \\
 -1.222 & -0.449 & 1.810 \\
 0.402 & -1.119 & -1.423

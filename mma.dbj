@@ -77,11 +77,11 @@ End of customized bst file
 %------\ans=*(==)-------
 %>>PRESENTATIONS:
 %<<ORDERING OF REFERENCES (if non-author/year and non-alph)
-%   %: (def) Alphabetical by all authors
-  seq-no,%: Citation order (unsorted, like unsrt.bst)
+  %: (def) Alphabetical by all authors
+% seq-no,%: Citation order (unsorted, like unsrt.bst)
 % seq-yr,%: Year ordered and then by authors
 % seq-yrr,%: Reverse year ordered and then by authors
-%------\ans=c(==seq-no)-------
+%------\ans=*(==def)-------
 %>>ORDERING OF REFERENCES (if non-author/year and non-alph)
 %<<ORDERING OF REFERENCES (if author-year citations)
 %   %: (def) Alphabetical by all authors
