@@ -27,8 +27,8 @@ End of customized bst file
 %------\ans=*(==def)-------
 %>>INTERNAL LANGUAGE SUPPORT (if no external language file)
 %<<STYLE OF CITATIONS:
-%    %: (def) Numerical as in standard LaTeX
-ay,%: Author-year with some non-standard interface
+    %: (def) Numerical as in standard LaTeX
+% ay,%: Author-year with some non-standard interface
 % alph,%: Alpha style, Jon90 or JWB90 for single or multiple authors
 % alph,alf-1,%: Alpha style, Jon90 even for multiple authors
 % alph,alf-f,%: Alpha style, Jones90 (full name of first author)
