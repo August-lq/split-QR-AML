@@ -2236,9 +2236,9 @@
 \endoptiongroup
 
 %% Add in the options section
-\beginoptiongroup{THESIS TYPE}
-  \optdef{*}{}{Do not print type of thesis (Ph.D., M.Sc., etc)}
-  \optdef{tth}{tth}{Print type of thesis (Ph.D., M.Sc., etc)}
+\beginoptiongroup{THESIS TYPE:}{}
+  \optdef{*}{}{Do not print type of thesis (Ph.D., M.Sc., etc)}{}
+  \optdef{tth}{tth}{Print type of thesis (Ph.D., M.Sc., etc)}{}
 \endoptiongroup
 
 \beginoptiongroup{TECHNICAL REPORT TITLE:}{}

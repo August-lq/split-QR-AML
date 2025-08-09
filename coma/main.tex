@@ -28,7 +28,7 @@
 \newtheorem{remark}[theorem]{Remark}
 
 %%%%% 参考文件管理
-\usepackage[numbers,sort&compress]{natbib} % 需要作者-年份或高级引用命令
+\usepackage{natbib} % 需要作者-年份或高级引用命令
 % \usepackage{cite} % 只用数字引用，功能简单
 \providecommand{\BIBand}{and}
 %%%%%% 引用链接，方便引用跳转可以去掉
@@ -85,20 +85,20 @@ Split quaternion algebra is not a Euclidean distance space because of having zer
 % \begin{multicols}{2}
 \section{Introduction}
 \vspace{-6pt}
-In 1849, James Cockle \cite{Cockle1849} introduced the concept of split quaternion algebra over the real number field $\mathbb{R}$, which is defined as:
+In 1849, James Cockle \citep{Cockle1849} introduced the concept of split quaternion algebra over the real number field $\mathbb{R}$, which is defined as:
 \begin{equation*}
     % \small
     \mathbb{H}_s = \left\{ a_0 + a_1 i + a_2 j + a_3 k ,a_0, a_1, a_2, a_3 \in \mathbb{R}\right\}, 
 \end{equation*} 
-where $i^2 = -1,\ j^2 = k^2 = 1, \ ijk = 1$. $\mathbb{H}_s$ is a four dimensional non-commutative algebra and contains zero divisors. In the past decades, many studies have been done on the split quaternions (see, e.g., \cite{AR2020,Yasemin2012,TJiang2015,Jiang2018,TJiang2018,Zhuo2020,Yang2020,mma2023,wang2024,Wang2021,Gang2024,yuan2017,Zhang2015}) and  many applications have been found in quantum mechanics, electromagnetism, signal processing, etc. (see, e.g., \cite{Gog2022, Hasebe2010, Le2022, Z2022, Wang2023}). For instance, \cite{Jiang2018} studied the eigenvalue problem of split quaternion matrices; \iffalse \cite{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \fi \cite{wang2024} solved a classical system of matrix equations; 
- \cite{Wang2021} proposed a fast algorithm for LDU decomposition; \cite{Gang2024} developed an efficient algorithm for the SVD decomposition. However, existing research has not yet fully addressed the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
+where $i^2 = -1,\ j^2 = k^2 = 1, \ ijk = 1$. $\mathbb{H}_s$ is a four dimensional non-commutative algebra and contains zero divisors. In the past decades, many studies have been done on the split quaternions \citep{AR2020,Yasemin2012,TJiang2015,Jiang2018,TJiang2018,Zhuo2020,Yang2020,mma2023,wang2024,Wang2021,Gang2024,yuan2017,Zhang2015} and  many applications have been found in quantum mechanics, electromagnetism, signal processing, etc. \citep{Gog2022, Hasebe2010, Le2022, Z2022, Wang2023}. For instance, \citep{Jiang2018} studied the eigenvalue problem of split quaternion matrices; \iffalse \citep{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \fi \citep{wang2024} solved a classical system of matrix equations; 
+ \citep{Wang2021} proposed a fast algorithm for LDU decomposition; \citep{Gang2024} developed an efficient algorithm for the SVD decomposition. However, existing research has not yet fully addressed the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
 
 To address the above problem, we constructively prove the existence of QR decomposition for split quaternion matrices and propose a novel, efficient algorithm for its computation. To validate the high efficiency of our algorithm, we provide the experimental results in terms of speed and accuracy.
 
 \section{Preliminaries}
 For any split quaternion matrix ${A}=A_{0}+A_{1}i + A_{2}j + A_{3}k \in\mathbb{H}_{s}^{m\times n}$, where $A_{i}\in\mathbb{R}^{m\times n}, i\in\{0,1,2,3\}$, its transpose, conjugate, conjugate transpose, i-conjugate and i-conjugate transpose are  denoted by 
  ${A}^T = A_0^T + A_1^Ti + A_2^Tj + A_3^Tk, \ \bar{{A}} = A_0 - A_1i - A_2j - A_3k, \ {A}^* = A_0^T - A_1^Ti - A_2^Tj - A_3^Tk,$ and
- $\tilde{A} = A_0 - A_1i + A_2j + A_3k, \ {A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively. Recall that the real representation matrix of a split quaternion matrix $A \in\mathbb{H}_{s}^{m\times n}$ can be presented as (\cite{TJiang2018, Gang2024}):
+ $\tilde{A} = A_0 - A_1i + A_2j + A_3k, \ {A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively. Recall that the real representation matrix of a split quaternion matrix $A \in\mathbb{H}_{s}^{m\times n}$ can be presented as (\citep{TJiang2018, Gang2024}):
 \begin{equation}\label{eq:2.1}
 A^\sigma = \begin{bmatrix} A_0 + A_2 & -A_1 + A_3 \\ A_1 + A_3 & A_0 - A_2 \end{bmatrix} \in \mathbb{R}^{2m \times 2n}.
 \end{equation}
@@ -115,7 +115,7 @@ Conversely, for any real matrix $B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} &
 \end{align}
 
 From equation \eqref{eq:2.1}, we have ${A}^\sigma = B$. 
-That is, $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$ (\cite{Gang2024}). Furthermore, $A$ is called unitary if $AA^H = A^H A = I$. $A$ is unitary if and only if $A^\sigma$ is orthogonal.
+That is, $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$ (\citep{Gang2024}). Furthermore, $A$ is called unitary if $AA^H = A^H A = I$. $A$ is unitary if and only if $A^\sigma$ is orthogonal.
  The Frobenius norm of $A$ is defined as: 
  \begin{align*}
      \| A \|_F &\equiv \frac{1}{\sqrt{2}} \| A^\sigma \|_F \notag \\
@@ -1029,10 +1029,10 @@ The data supporting the findings of this study are not publicly available due to
 
 \parskip=10pt
 
-\renewcommand{\bibname}{}
+% \renewcommand{\bibname}{}
 
-\section*{References}
-\vspace{-8em}
+% \section*{References}
+% \vspace{-8em}
 % \begin{list}{[\arabic{enumi}]}{\usecounter{enumi} %%
 \leftmargin=2em%%%%%%
 % \labelsep=1em%%%%%
