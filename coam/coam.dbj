@@ -483,8 +483,8 @@ End of customized bst file
 %------\ans=*(==issn)-------
 %>>ISSN NUMBER:
 %<<DOI NUMBER:
-  doi,%: Include DOI as "doi: number"
-% url-doi,%: Format DOI as URL //dx.doi.org/doi (must give url options!)
+%  doi,%: Include DOI as "doi: number"
+ url-doi,%: Format DOI as URL //dx.doi.org/doi (must give url options!)
 % agu-doi,doi,%: Insert DOI AGU style as part of page number
 %   %: (def) No DOI 
 %------\ans=*(==doi)-------

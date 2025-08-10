@@ -4,7 +4,7 @@
 %%
 %% The original source files were:
 %%
-%% merlin.mbs  (with options: `ay,nat,nm-rvx,ed-rev,jnrlst,nmlm,x3,m3,mct-3,mct-x3,keyxyr,dt-beg,yr-par,note-yr,atit-u,jttl-rm,num-xser,jnm-x,btit-rm,bt-rm,isbn,issn,doi,blk-tit,blk-com,com-blank,in-col,pp,ed,abr,xedn,and-xcom,xand,eprint,url,url-blk,nfss,')
+%% merlin.mbs  (with options: `ay,nat,nm-rvx,ed-rev,jnrlst,nmlm,x3,m3,mct-3,mct-x3,keyxyr,dt-beg,yr-par,note-yr,atit-u,jttl-rm,num-xser,jnm-x,btit-rm,bt-rm,isbn,issn,url-doi,blk-tit,blk-com,com-blank,in-col,pp,ed,abr,xedn,and-xcom,xand,eprint,url,url-blk,nfss,')
 %% ----------------------------------------
 %% ***  ***
 %% 
@@ -392,7 +392,10 @@ FUNCTION {format.eprint}
 }
 FUNCTION {format.url}
 {
-  url
+  doi empty$
+    { url }
+    { "http://dx.doi.org/" doi * }
+  if$
   duplicate$ empty$
     { pop$ "" }
     { "\urlprefix\url{" swap$ * "}" * }
@@ -499,14 +502,6 @@ FUNCTION {format.issn}
   if$
 }
 
-FUNCTION {format.doi}
-{ doi empty$
-    { "" }
-    {
-      "\doi{" doi * "}" *
-    }
-  if$
-}
 FUNCTION {format.note}
 {
  note empty$
@@ -963,7 +958,6 @@ FUNCTION {article}
     }
   if$
   format.issn output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -998,7 +992,6 @@ FUNCTION {book}
   if$
   format.edition output
   format.isbn output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1015,7 +1008,6 @@ FUNCTION {booklet}
   howpublished "howpublished" bibinfo.check output
   address "address" bibinfo.check output
   format.isbn output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1057,7 +1049,6 @@ FUNCTION {inbook}
     { format.isbn output }
     'skip$
   if$
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1085,7 +1076,6 @@ FUNCTION {incollection}
       format.chapter.pages output
     }
   if$
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1117,7 +1107,6 @@ FUNCTION {inproceedings}
       format.pages output
     }
   if$
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1135,7 +1124,6 @@ FUNCTION {manual}
   organization "organization" bibinfo.check output
   address "address" bibinfo.check output
   format.edition output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1154,7 +1142,6 @@ FUNCTION {mastersthesis}
   bbl.mthesis format.thesis.type output.nonnull
   school "school" bibinfo.warn output
   address "address" bibinfo.check output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1170,7 +1157,6 @@ FUNCTION {misc}
   format.title output
   new.sentence
   howpublished "howpublished" bibinfo.check output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1187,7 +1173,6 @@ FUNCTION {phdthesis}
   new.sentence
   school "school" bibinfo.warn output
   address "address" bibinfo.check output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1211,7 +1196,6 @@ FUNCTION {proceedings}
   if$
   format.isbn output
   format.issn output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1230,7 +1214,6 @@ FUNCTION {techreport}
   format.tr.number output.nonnull
   institution "institution" bibinfo.warn output
   address "address" bibinfo.check output
-  format.doi output
   format.url output
   format.note output
   format.eprint output
@@ -1244,7 +1227,6 @@ FUNCTION {unpublished}
   format.date "year" output.check
   date.block
   format.title "title" output.check
-  format.doi output
   format.url output
   format.note "note" output.check
   format.eprint output
@@ -1548,12 +1530,6 @@ FUNCTION {begin.bib}
   "\providecommand{\url}[1]{\texttt{#1}}"
   write$ newline$
   "\providecommand{\urlprefix}{URL }"
-  write$ newline$
-  "\expandafter\ifx\csname urlstyle\endcsname\relax"
-  write$ newline$
-  "  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else"
-  write$ newline$
-  "  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup \urlstyle{rm}\Url}\fi"
   write$ newline$
   "\providecommand{\eprint}[2][]{\url{#2}}"
   write$ newline$

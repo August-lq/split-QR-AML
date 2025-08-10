@@ -18,6 +18,8 @@
 \usepackage{algorithm} % 算法
 \usepackage{algmatlab}
 
+\usepackage [top=0.8in, bottom=1in, left=2cm, right=2cm]{geometry}
+
 % 其他数学环境
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{definition}[theorem]{Definition}
@@ -26,6 +28,11 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{example}[theorem]{Example}
 \newtheorem{remark}[theorem]{Remark}
+%\newtheorem{algorithm}[theorem]{Algorithm}
+
+\newenvironment{proof}{\noindent {\bf Proof.\ }}{\vspace{2ex}}
+
+\numberwithin{equation}{section}
 
 %%%%% 参考文件管理
 \usepackage{natbib} % 需要作者-年份或高级引用命令
@@ -37,9 +44,10 @@
 %%%%%% 
 
 \usepackage{cleveref} % 智能引用
+
 \usepackage{caption} % 用于设置标题格式
 % 设置图片标题前缀为 "Fig."
-\captionsetup[figure]{name=Fig.}
+\captionsetup[figure]{name=Figure}
 \captionsetup[algorithm]{name=Algorithm}
 
 % 设置 cleveref 引用前缀
@@ -49,9 +57,24 @@
 %%%% 编辑临时使用
 \newcommand{\red}{\color{red}}
 
-%%%%% 以下为杂志特定
-\usepackage [top=0.8in, bottom=1in, left=2cm, right=2cm]{geometry}
-
+% 重定义摘要环境的标题样式
+\makeatletter
+\renewenvironment{abstract}{%
+  % \small
+  % \begin{center}% 注释掉这行可取消默认居中
+  \noindent\bfseries \abstractname \par%
+  \normalfont
+  % \end{center}% 注释掉这行可取消默认居中
+  % \vspace{-.5em}\noindent\rule{\textwidth}{0.4pt}\vspace{.5em}% 可选：添加下划线
+  \list{}{%
+    \leftmargin=0cm% 左边距为0
+    \rightmargin=0cm% 右边距为0
+  }%
+  \item\relax
+}{%
+  \endlist
+}
+\makeatother
 
 \newcommand\blfootnote[1]{%
   \begingroup
@@ -60,18 +83,19 @@
   \endgroup
 }
 
-
 \begin{document}
-%-------------------- FRONTMATTER --------------------
 
+%-------------------- FRONTMATTER --------------------
 \begin{center}
 
+% 标题
 {\LARGE \textbf{An Algorithm for QR Decomposition of Split Quaternion Matrices} }
+
 \blfootnote{This research is supported by Macao Science and Technology Development Fund (No. 0013/2021/ITP), the grants from the National Natural Science Foundation of China  (12371023, 12271338, 12001259), and the Natural Sciences and Engineering Research Council of Canada (NSERC) (RGPIN 2020-06746), The Joint Research and Development Fund of Wuyi University, Hong Kong and Macao (2019WGALH20), The MUST Faculty Research Grants (FRG-22-073-FIE). \par
 * Corresponding author
 E-mail: xiliu@must.edu.mo
  }
- 
+%作者与机构 
 \bigskip
 $${\textbf{Qianqian Liu}^{1}, \textbf{Xin Liu}^{2, \ast}, \textbf{Jianhai Lin}^{3}, \textbf{Yang Zhang}^{4}}$$
 \newline $^{\text{1,3}}$Faculty of Innovation Engineering, Macau University of Science and Technology, Avenida Wai Long, TaiPa, Macau, 999078, China; 
@@ -82,78 +106,130 @@ $${\textbf{Qianqian Liu}^{1}, \textbf{Xin Liu}^{2, \ast}, \textbf{Jianhai Lin}^{
 \end{center}
 
 % 摘要
+
 \begin{abstract}
 Split quaternion algebra is not a Euclidean distance space because of having zero divisors. Thus, the traditional QR decomposition based on Givens rotations and Householder reflection transformations is difficult to implement. To overcome this difficulty and to address the non-commutativity of split quaternion multiplication, we utilize the real representation $A^\sigma$ of the split quaternion matrix $A$. By leveraging the proposed decomposition $A^\sigma = \widetilde{Q}R_4$ ($\widetilde{Q}$ is an orthogonal matrix, and $R_4 = \begin{bmatrix} R_{11} & R_{12} \\ R_{21} & R_{22} \end{bmatrix}$ with $R_{11}, R_{12}, R_{21}, R_{22}$ being upper triangular), the QR decomposition of $A$ is successfully constructed and the corresponding algorithms are developed.The experimental results show that it performs well in both speed and accuracy.
 \end{abstract}
-
-\noindent\textbf{Key words:}   Split quaternion matrix, QR decomposition, Permutation matrix, Upper triangular matrix
+%关键词
+\noindent\textbf{Keywords} Split quaternion matrix, QR decomposition, Permutation matrix, Upper triangular matrix
 \\
-\noindent\textbf{AMS 2010 Subject Classification:} 15B10 15B33, 15A20, 15A23.
+\noindent\textbf{AMS 2010 Subject Classification:} 15B10, 15B33, 15A20, 15A23.
 
 %-------------------- 正文主体 --------------------
 
-% \begin{multicols}{2}
 \section{Introduction}
-\vspace{-6pt}
 In 1849, James Cockle \citep{Cockle1849} introduced the concept of split quaternion algebra over the real number field $\mathbb{R}$, which is defined as:
 \begin{equation*}
-    % \small
-    \mathbb{H}_s = \left\{ a_0 + a_1 i + a_2 j + a_3 k ,a_0, a_1, a_2, a_3 \in \mathbb{R}\right\}, 
+    \mathbb{H}_s = \left\{ a_0 + a_1 i + a_2 j + a_3 k \ \bigg| \ i^2 = -1,\ j^2 = k^2 = 1, \ ijk = 1, \ a_0, a_1, a_2, a_3 \in \mathbb{R}\right\}. 
 \end{equation*} 
-where $i^2 = -1,\ j^2 = k^2 = 1, \ ijk = 1$. $\mathbb{H}_s$ is a four dimensional non-commutative algebra and contains zero divisors. In the past decades, many studies have been done on the split quaternions \citep{AR2020,Yasemin2012,TJiang2015,Jiang2018,TJiang2018,Zhuo2020,Yang2020,mma2023,wang2024,Wang2021,Gang2024,yuan2017,Zhang2015} and  many applications have been found in quantum mechanics, electromagnetism, signal processing, etc. \citep{Gog2022, Hasebe2010, Le2022, Z2022, Wang2023}. For instance, \citep{Jiang2018} studied the eigenvalue problem of split quaternion matrices; \iffalse \citep{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \fi \citep{wang2024} solved a classical system of matrix equations; 
- \citep{Wang2021} proposed a fast algorithm for LDU decomposition; \citep{Gang2024} developed an efficient algorithm for the SVD decomposition. However, existing research has not yet fully addressed the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
 
-To address the above problem, we constructively prove the existence of QR decomposition for split quaternion matrices and propose a novel, efficient algorithm for its computation. To validate the high efficiency of our algorithm, we provide the experimental results in terms of speed and accuracy.
+ $\mathbb{H}_s$ is a four dimensional non-commutative algebra and contains zero divisors. 
+  In the past decades, many studies have been done on the \iffalse algebraic properties of \fi split quaternions \citep{AR2020,Yasemin2012,TJiang2015,Jiang2018,TJiang2018,Zhuo2020,Yang2020,mma2023,wang2024,Wang2021,Gang2024,yuan2017,Zhang2015} and  many applications have been found in quantum mechanics, electromagnetism, signal processing, etc. \citep{Gog2022, Hasebe2010, Le2022, Z2022, Wang2023}. For instance, \citep{Jiang2018} studied the eigenvalue problem of split quaternion matrices; \iffalse \cite{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \fi \citep{wang2024} solved a classical system of matrix equations; 
+ \citep{Wang2021} proposed a fast algorithm for LDU decomposition; \citep{Gang2024} developed an efficient algorithm for the SVD. However, existing research has not yet fully addressed the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
+ 
+We acknowledge that the split quaternion algebra does not constitute an Euclidean space, rendering traditional Givens rotations and Householder reflections inapplicable when applied to split quaternion vectors. This poses a substantial challenge for the conventional QR decomposition process for split quaternion matrices.
+
+To address the above problem, we intend to utilize the real representation of split quaternions. Indeed, there exist multiple forms of such real representations \citep{Zhuo2020, Yang2020, Xin2019, Gang2024}. For example,  a split quaternion matrix $A$ of size $m \times n$  can be represented as a real matrix $A^\sigma$ 
+  with dimensions $4m \times 4n$ \citep{Xin2019}. In contrast, the real representation matrix presented in \cite{Gang2024} has a dimension of $2m \times 2n$. Compared to the former, the $2m \times 2n$ real representation matrix offers more advantages in terms of dimension expansion. By employing this compact real representation, the  problem of split quaternion decomposition is converted into a specific decomposition problem for real matrices. This approach not only presents the potential for reducing computational time but also streamlines the algorithm's complexity. Therefore, through the use of the real representation method, 
+we constructively prove the existence of QR decomposition for split quaternion matrices and propose a novel and efficient algorithm for its computation. To validate the high efficiency of our algorithm, we provide the experimental results in terms of speed and accuracy.
+
+The paper is organized as follows. In Section 2, the real representation of split quaternion matrices and their properties are introduced. In Section 3, a constructive proof of the existence of QR decomposition for split quaternion matrices is provided, along with the corresponding algorithm and an analysis of its computational complexity. In Section 4, we use one example to show the efficiency and accuracy of our algorithm. We also use another example to show the application in solving a split quaternion matrix equation. Finally, the contributions of this paper and future work are summarized in Section 5.
+
 
 \section{Preliminaries}
 For any split quaternion matrix ${A}=A_{0}+A_{1}i + A_{2}j + A_{3}k \in\mathbb{H}_{s}^{m\times n}$, where $A_{i}\in\mathbb{R}^{m\times n}, i\in\{0,1,2,3\}$, its transpose, conjugate, conjugate transpose, i-conjugate and i-conjugate transpose are  denoted by 
  ${A}^T = A_0^T + A_1^Ti + A_2^Tj + A_3^Tk, \ \bar{{A}} = A_0 - A_1i - A_2j - A_3k, \ {A}^* = A_0^T - A_1^Ti - A_2^Tj - A_3^Tk,$ and
- $\tilde{A} = A_0 - A_1i + A_2j + A_3k, \ {A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively. Recall that the real representation matrix of a split quaternion matrix $A \in\mathbb{H}_{s}^{m\times n}$ can be presented as (\citep{TJiang2018, Gang2024}):
+ $\tilde{A} = A_0 - A_1i + A_2j + A_3k, \ {A}^H = A_0^T - A_1^Ti + A_2^Tj + A_3^Tk$, respectively. Recall that the real representation matrix of a split quaternion matrix $A \in\mathbb{H}_{s}^{m\times n}$ can be presented as \citep{TJiang2018, Gang2024}:
 \begin{equation}\label{eq:2.1}
 A^\sigma = \begin{bmatrix} A_0 + A_2 & -A_1 + A_3 \\ A_1 + A_3 & A_0 - A_2 \end{bmatrix} \in \mathbb{R}^{2m \times 2n}.
 \end{equation}
 
 For $A, B \in \mathbb{H}_s^{m \times n}$, $C \in \mathbb{H}_s^{n \times p}$, $a \in \mathbb{R}$, the following properties hold:
-\begin{align}\label{eq:2.2}
-     &(A + B)^\sigma = A^\sigma + B^\sigma, \quad (AC)^\sigma = A^\sigma C^\sigma,  \notag \\
-     &(a A)^\sigma = a A^\sigma, \ (A^H)^\sigma = (A^\sigma)^T.
-\end{align}
+\begin{equation}\label{eq:2.2}
+    (A + B)^\sigma = A^\sigma + B^\sigma, \quad (AC)^\sigma = A^\sigma C^\sigma, \quad (a A)^\sigma = a A^\sigma, \ (A^H)^\sigma = (A^\sigma)^T.
+\end{equation}
 Conversely, for any real matrix $B = \begin{bmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{bmatrix} \in \mathbb{R}^{2m \times 2n}$, $B_{ts} \in \mathbb{R}^{m \times n}$, $t, s = 1, 2$, a corresponding split quaternion matrix $A$ can be constructed as follows:
-\begin{align}\label{eq:2.3}
-{A} &= \frac{B_{11} + B_{22}}{2} + \frac{B_{21} - B_{12}}{2}i \notag  \\
-&+ \frac{B_{11} - B_{22}}{2}j + \frac{B_{21} + B_{12}}{2}k.
-\end{align}
+\begin{equation}\label{eq:2.3}
+{A} = \frac{B_{11} + B_{22}}{2} + \frac{B_{21} - B_{12}}{2}i + \frac{B_{11} - B_{22}}{2}j + \frac{B_{21} + B_{12}}{2}k.
+\end{equation}
 
 From equation \eqref{eq:2.1}, we have ${A}^\sigma = B$. 
-That is, $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$ (\citep{Gang2024}). Furthermore, $A$ is called unitary if $AA^H = A^H A = I$. $A$ is unitary if and only if $A^\sigma$ is orthogonal.
+That is, $\sigma$ provides an one-to-one corresponding between $\mathbb{H}_s^{m\times n}$ and $\mathbb{R}^{2m \times 2n}$ \citep{Gang2024}. Furthermore, $A$ is called unitary if $AA^H = A^H A = I$. $A$ is unitary if and only if $A^\sigma$ is orthogonal.
  The Frobenius norm of $A$ is defined as: 
  \begin{align*}
-     \| A \|_F &\equiv \frac{1}{\sqrt{2}} \| A^\sigma \|_F \notag \\
-     &= \sqrt{\| A_0 \|_F^2 + \| A_1 \|_F^2 + \| A_2 \|_F^2 + \| A_3 \|_F^2}.
+ % $
+     \| A \|_F \equiv \frac{1}{\sqrt{2}} \| A^\sigma \|_F = \sqrt{\| A_0 \|_F^2 + \| A_1 \|_F^2 + \| A_2 \|_F^2 + \| A_3 \|_F^2}.
+% $
 \end{align*}
-When $U, V$ are unitary, $U^\sigma$ and $V^\sigma$ are orthogonal, which will not change the Frobenius norm of $A^\sigma$. Hence,
+\iffalse 
+When $U$ and $ V$ are unitary, $U^\sigma$ and $V^\sigma$ are orthogonal, {\color{red} which will not change the Frobenius norm of $A^\sigma$. Hence, ???}\fi
+If $U$ and $ V$ are unitary, then $U^\sigma$ and $V^\sigma$ are orthogonal.  Hence,
 \begin{align*}
-\|UAV\|_F &= \frac{1}{\sqrt{2}} \|(UAV)^\sigma\|_F \\
-&= \frac{1}{\sqrt{2}} \|U^\sigma A^\sigma V^\sigma\|_F \\
-&= \frac{1}{\sqrt{2}} \|A^\sigma\|_F \\
-&= \|A\|_F.
+ % $
+\|UAV\|_F = \frac{1}{\sqrt{2}} \|(UAV)^\sigma\|_F 
+= \frac{1}{\sqrt{2}} \|U^\sigma A^\sigma V^\sigma\|_F 
+= \frac{1}{\sqrt{2}} \|A^\sigma\|_F 
+= \|A\|_F.
+ % $
 \end{align*}
 
 \section{QR Decomposition of Split Quaternion Matrices}
-In this section, we discuss the QR decomposition of split quaternion matrices through construction, and develop an efficient algorithm for computing it. Let $A \in \mathbb{H}_s^{m \times n}$. We use the following two steps to construct its QR decomposition.  
+In this section, we discuss the QR decomposition of split quaternion matrices through construction, and develop an efficient algorithm for computing it. Let $A \in \mathbb{H}_s^{m \times n}$, we will achieve this through a two-step process.
 
-\textbf{Step 1:} Perform the decomposition of $A^\sigma \in \mathbb{R}^{2m \times 2n}$ as 
+\noindent \textbf{Step 1:} To construct the upper triangular split quaternion matrix, we will apply row/column transformations to rewrite the QR decomposition of $A^\sigma \in \mathbb{R}^{2m \times 2n}$ as 
 \begin{equation}\label{splitqr}
 A^\sigma = \widetilde{Q} R_4,
 \end{equation} 
-where $\widetilde{Q} \in \mathbb{R}^{2m\times 2m}$ is orthogonal, and $R_4  $ is in the form of 
+where $\widetilde{Q} \in \mathbb{R}^{2m\times 2m}$ is orthogonal, and $R_4$ is in the form of 
 \begin{equation}\label{r4}
 R_4 = \begin{bmatrix}
     R_{11} & R_{12} \\
     R_{21} & R_{22}
 \end{bmatrix} \in \mathbb{R}^{2m \times 2n},
 \end{equation}
-and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m \times n$. To achieve the special decomposition \eqref{splitqr}, we will first  figure out how to  transform an upper triangular matrix $R$ into $R_4$ (\cref{fig:Figure_1}) through permutation transformations.
+and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m \times n$. This is the challenge part of our paper, and only this special decomposition accomplished, then we can subsequently construct the corresponding unitary matrix \(Q\) and upper triangular matrix \(R\) for the QR decomposition of \(A\).
+
+To achieve the special decomposition \eqref{splitqr}, we first figure out how to transform an upper triangular matrix $R$ into $R_4$ (\cref{fig:Figure_1}) through permutation transformations:
+\iffalse
+For a given matrix $R\in \mathbb{R}^{2m \times 2n}$, we swap its rows $r_i$ as follows: 
+\begin{equation}\label{rowswap}
+r_2\longleftrightarrow r_{m +1 + (m \bmod 2)}, \ \  r_4\longleftrightarrow r_{m+3+(m \bmod 2)}, \ \dots, \ \   r_{m - (m \bmod 2)}   \longleftrightarrow r_{2m-1}.
+\end{equation}
+{\color{red} Above formulas do not match the precess of example???}
+
+Next we partition the resulting matrix into the upper matrix $R_{upper}\in \mathbb{R}^{m \times 2n}$ and the lower matrix $R_{lower}\in \mathbb{R}^{m \times 2n}$. If $m$ is odd, appending a zero row to the end of the last row of the upper submatrix and prepending a zero row to the beginning of the first row of the lower submatrix ensure that the parity of each row index remains unchanged before the swap, the position of a zero row stays fixed after the swap, and further partitioning is possible. The next is removing the added zero rows to keep the same size. Subsequently, for  $R_{upper}$ and $ R_{lower}$, recursively apply the aforementioned row swapping and partitioning, zero-padding, and zero-removing operations to each submatrix until each submatrix contains only two rows. Analogous operations are performed on the columns, ultimately producing the resulting matrix $R_4$.
+It is the key to accomplishing the special decomposition \eqref{splitqr}.
+\fi
+\newline
+\newline
+First, perform row permutations on $R\in \mathbb{R}^{2m \times 2n}$:
+\begin{enumerate}
+\item Swap its rows $r_i$ as follows:  
+   \begin{equation} \label{eq:rowswap}
+       r_2 \leftrightarrow r_{m + 1 + (m \bmod 2)}, \quad r_4 \leftrightarrow r_{m + 3 + (m \bmod 2)}, \quad \dots, \quad r_{m - (m \bmod 2)} \leftrightarrow r_{2m - 1}.
+   \end{equation}
+\item  Partition the swapped matrix into an upper submatrix \( R_{\text{upper}} \in \mathbb{R}^{m \times 2n} \) and a lower submatrix \( R_{\text{lower}} \in \mathbb{R}^{m \times 2n} \). If \( m \) is odd, append a zero row to the end of the last row of \( R_{\text{upper}} \) and prepend a zero row to the beginning of the first row of \( R_{\text{lower}} \) ensuring that the parity of each row index remains unchanged before the swap, the position of the zero row stays fixed after the swap, and further partitioning is possible.
+ 
+\item Repeat steps 1 and 2 for \( R_{\text{upper}} \) and \( R_{\text{lower}} \) until all  partitioned submatrices contain exactly 2 rows.  
+ 
+\item  Remove the added zero rows in step 2 to keep the same size.
+\end{enumerate}
+Second, proceed to perform column permutations on resulting matrix:
+\begin{enumerate}
+\item For the columns \( c_i \) of the resulting matrix, we swap as follows:  
+   \begin{equation} \label{eq:cswap}
+       c_2 \leftrightarrow c_{n + 1 + (n \bmod 2)}, \quad c_4 \leftrightarrow c_{n + 3 + (n \bmod 2)}, \quad \dots, \quad c_{n - (n \bmod 2)} \leftrightarrow c_{2n - 1}.
+   \end{equation}  
+\item  Partition the swapped matrix into a left submatrix \( R_{\text{left}} \in \mathbb{R}^{2m \times n} \)  and a right submatrix \( R_{\text{right}} \in \mathbb{R}^{2m \times n} \). If \( n \) is odd, append a zero column to the end of the last column of \( R_{\text{left}} \) and prepend a zero column to the beginning of the first column of \( R_{\text{right}} \), ensuring that the parity of each column index remains unchanged before the swap, the position of the zero column stays fixed after the swap, and further partitioning is possible.  
+ 
+\item  Repeat steps 1 and 2 for \( R_{\text{left}} \) and \( R_{\text{right}} \) until all partitioned submatrices contain exactly 2 columns. 
+ 
+\item Remove the added zero columns in step 2 to keep the same size.
+\end{enumerate}
+
+
+ Ultimately, the matrix \( R_4 \) is obtained through the above row and column permutations.
+
 \begin{figure}[htbp]
     % \begin{minipage}[htbp]{0.45\textwidth}
         \centering
@@ -162,12 +238,11 @@ and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m 
         \label{fig:Figure_1}
 \end{figure}
 
-{\color{red}Perform swaps on the rows of $R\in \mathbb{R}^{2m \times 2n}$: $r_2\leftrightarrow r_{m +1 + (m \bmod 2)}$, $r_4\leftrightarrow r_{m+3+(m \bmod 2)}$, $\dots$, $r_{m - (m \bmod 2)}$ $ \leftrightarrow r_{2m-1}$. Then partition the resulting matrix into the upper matrix $R_{upper}\in \mathbb{R}^{m \times 2n}$ and the lower matrix $R_{lower}\in \mathbb{R}^{m \times 2n}.$ If $m$ is odd, appending zeros row to the end of the last row of the upper submatrix and prepending zeros row to the beginning of the first row of the lower submatrix ensures that the parity of each row index remains unchanged before the swap, the position of zero rows stays fixed after the swap, and further partitioning is possible. The next is removing the added zeros rows to keep the same size. Subsequently, for the $R_{upper}, R_{lower}$, recursively apply the aforesaid row swapping and partitioning, zero-padding and zero-removing operations to each submatrix until each submatrix contains only two rows; analogous operations are performed on the columns, ultimately yielding the resulting matrix $R_4$.}
-It is the key to accomplishing the special decomposition \eqref{splitqr}.
+
 \iffalse
 {\color{red}V1: Perform swaps on the rows of $R\in \mathbb{R}^{2m \times 2n}$: $r_2\leftrightarrow r_{m +1 + (m \bmod 2)}$, $r_4\leftrightarrow r_{m+3+(m \bmod 2)}$, $\dots$, $r_{m - (m \bmod 2)} \leftrightarrow r_{2m-1}$. Then partition the resulting matrix into  the upper matrix $R_{upper}\in \mathbb{R}^{m \times 2n}$ and the lower matrix $R_{lower}\in \mathbb{R}^{m \times 2n}.$ If $m$ is odd, appending zeros row to the end of the last row of the upper submatrix and prepending zeros row to the beginning of the first row of the lower submatrix ensures that the parity of each row index remains unchanged before the swap, the position of zero rows stays fixed after the swap, and further partitioning is possible. The next is removing the added zeros rows to keep the same size. Subsequently, for the $R_{upper}, R_{lower}$, recursively apply the aforesaid row swapping and partitioning, zero-padding and zero-removing operations to each submatrix until each submatrix contains only two rows; analogous operations are performed on the columns, ultimately yielding the resulting matrix $R_4$.}
 \fi 
-To better understand the procedure, we will choose the matrix 
+To better understand the procedure, we choose the following matrix 
 \[R= \begin{bmatrix}
  r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
  0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
@@ -175,23 +250,19 @@ To better understand the procedure, we will choose the matrix
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix}
+\end{bmatrix} \in \mathbb{R}^{2\cdot 3 \times 2 \cdot 4}
 \]
-to demonstrate.Through the above process, we can obtain
+to show how the row/column transformations work. 
 \iffalse
-We will first describe how to achieve this in the algorithm, followed by providing the theoretical underpinning for the operation:
+Through the above process, we have
+\iffalse
 
- In this way, we can obtain
+show how our method works.  We will first describe how to achieve this in the algorithm, followed by providing the theoretical underpinning for the operation:
 \fi
-\iffalse
-We  perform the following row and column swaps on matrix $R$:
 
-  Replace the odd rows (1, 3, 5) sequentially with the first three rows. Replace the even rows (2, 4, 6) sequentially with the last three rows. Replace the odd columns (1, 3, 5) sequentially with the first three columns. Replace the even columns (2, 4, 6) sequentially with the last three columns.
-
-place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) rows of the resulting matrix.  Next, perform column operations on the resulting matrix, place the columns (1, 3, 5, 7, 2, 4, 6, 8) of the resulting matrix respectively to the columns (1, 2, 3, 4, 5, 6, 7, 8). In this way, we can obtain
- \fi
+  \iffalse Perform swaps on the rows of $R\in \mathbb{R}^{2m \times 2n}$: $r_2\leftrightarrow r_{m +1 + (m \bmod 2)}$, $r_4\leftrightarrow r_{m+3+(m \bmod 2)}$, $\dots$, $r_{m - (m \bmod 2)}$ $ \leftrightarrow r_{2m-1}$. Then partition the resulting matrix into the upper matrix $R_{upper}\in \mathbb{R}^{m \times 2n}$ and the lower matrix $R_{lower}\in \mathbb{R}^{m \times 2n}.$ If $m$ is odd, appending zeros row to the end of the last row of the upper submatrix and prepending zeros row to the beginning of the first row of the lower submatrix ensures that the parity of each row index remains unchanged before the swap, the position of zero rows stays fixed after the swap, and further partitioning is possible. The next is removing the added zeros rows to keep the same size. Subsequently, for the $R_{upper}, R_{lower}$, recursively apply the aforesaid row swapping and partitioning, zero-padding and zero-removing operations to each submatrix until each submatrix contains only two rows; analogous operations are performed on the columns, ultimately yielding the resulting matrix $R_4$.  This corresponding process can be realized by Algorithm \cref{alg:Permutation}. In this way, we can obtain\fi
 \iffalse
-\[R_4 = \begin{bmatrix}
+\[R = \begin{bmatrix}
 \begin{array}{cccc:cccc}
  r_{11} & r_{13} & r_{15} & r_{17} & r_{12} & r_{14} & r_{16} & r_{18}\\
  0      & r_{33} & r_{35} & r_{37} & 0      & r_{34} & r_{36} & r_{38}\\
@@ -207,29 +278,30 @@ place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) 
 \fi
 
 \begin{align*}
-R =
- & \begin{bmatrix}
+R &=
+  \begin{bmatrix}
  r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
  0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
  0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix}\\
+\end{bmatrix}
 \xrightarrow{r_{2} \leftrightarrow r_{5}}
-&\begin{bmatrix}
+\begin{bmatrix}
+% \begin{array}{cc:cc:cc}
  r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
  0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
  0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ % \cdashline{1-8}
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix}\\
-% 将矩阵分成上下两个子块
-Partition the matrix into upper and lower sub-blocks.
-partition\ to\ R_{upper},\ R_{lower}\\
-% \xrightarrow{partition\ to\ R_{upper},\ R_{lower}}
-&\begin{bmatrix}
+% \end{array}
+\end{bmatrix}.
+\end{align*}\\
+Next, partition the matrix into \( R_{upper} \) and \( R_{lower} \). Due to the fact that both \( R_{upper} \) and \( R_{lower} \) have an odd number of rows, we must append a zero row to the end of the last row of \( R_{upper} \) and prepend a zero row to the beginning of the first row of \( R_{lower} \): \begin{align*}
+& \begin{bmatrix}
  r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
  0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
  0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
@@ -237,39 +309,31 @@ partition\ to\ R_{upper},\ R_{lower}\\
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & r_{22}  & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix}\\
-\xrightarrow{add\ zero\ lows}
-&\begin{bmatrix}
+\end{bmatrix}
+\xrightarrow{add\ zero\ rows}
+\begin{bmatrix}
  r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
  0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
  0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
- 0      & 0      & 0      & 0      & 0      & 0      &        & 0     \\
+ 0      & 0      & 0      & 0      & 0      & 0      & 0      & 0     \\
  \cdashline{1-8}
- 0      & 0      & 0      & 0      & 0      & 0      &        & 0     \\
+ 0      & 0      & 0      & 0      & 0      & 0      & 0      & 0     \\
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix}\\
-\xrightarrow{r_{2} \leftrightarrow r_{3}\ in\ R_{upper}}
+\end{bmatrix} 
+\end{align*}
+Next, we proceed by performing row swaps on both \( R_{upper} \) and \( R_{lower} \) individually, following \eqref{rowswap}. Afterward, we eliminate the zero rows that were added in order to maintain the original dimensions of the matrices:\\
+% &\xrightarrow{partition\ to\ R_{upper},\ R_{lower}}
+\begin{align*}
+\xrightarrow[r_{2} \leftrightarrow r_{3}\ in\ R_{lower}]{r_{2} \leftrightarrow r_{3}\ in\ R_{upper}}
 &\begin{bmatrix}
  r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
  0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
  0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
- 0      & 0      & 0      & 0      & 0      & 0      &        & 0     \\
- \cdashline{1-8}
- 0      & 0      & 0      & 0      & 0      & 0      &        & 0     \\
- 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
- 0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
- 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix} \\
-\xrightarrow{r_{2} \leftrightarrow r_{3}\ in\ R_{lower}}
-&\begin{bmatrix}
- r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
- 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
- 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
- 0      & 0      & 0      & 0      & 0      & 0      &        & 0     \\
- \cdashline{1-8}
- 0      & 0      & 0      & 0      & 0      & 0      &        & 0     \\
+ 0      & 0      & 0      & 0      & 0      & 0      &  0     & 0     \\
+\cdashline{1-8}
+ 0      & 0      & 0      & 0      & 0      & 0      & 0      & 0     \\
  0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
@@ -282,7 +346,12 @@ partition\ to\ R_{upper},\ R_{lower}\\
  0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
  0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
  0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
-\end{bmatrix}\\
+\end{bmatrix}
+\end{align*}
+Now we perform column swaps \begin{equation}\label{cswap}
+c_2\longleftrightarrow c_{n +1 + (n \bmod 2)}, \ \  c_4\longleftrightarrow c_{n+3+(n \bmod 2)}, \ \dots, \ \   c_{n - (n \bmod 2)}   \longleftrightarrow c_{2n-1}.
+\end{equation}
+\begin{align*}
 \xrightarrow{c_{2} \leftrightarrow c_{5}}
 &\begin{bmatrix}
  r_{11} & r_{15} & r_{13} & r_{14} &  r_{12} & r_{16} & r_{17} & r_{18}\\
@@ -302,7 +371,10 @@ partition\ to\ R_{upper},\ R_{lower}\\
  0      & r_{25} & r_{23} & r_{27} & r_{22} & r_{26} & r_{24} & r_{28}\\
  0      & r_{45} & 0      & r_{47} & 0      & r_{46} & r_{44} & r_{48}\\
  0      & 0      & 0      & r_{67} & 0      & r_{66} & 0      & r_{68}\\
-\end{bmatrix}\\
+\end{bmatrix}\end{align*}
+{\color{blue}Provide a more detailed description of column swap.} Partition the matrix into \ $R_{left}, \ R_{right}$. Since the column number of them are odd, 
+ we need to add zero column to  the end of the last column of  $R_{left}$ and add zero column to the beginning of the first column of  $\ R_{lower}$:
+ \begin{align*}
 \xrightarrow{partition\ to\ R_{left},\ R_{right}}
 &\begin{bmatrix}
 \begin{array}{cccc:cccc}
@@ -341,7 +413,158 @@ partition\ to\ R_{upper},\ R_{lower}\\
     R_{11} & R_{12}\\R_{21} & R_{22}
 \end{bmatrix} = R_4
 \end{align*}
-
+\fi
+We perform row swaps on $R$, following (\ref{eq:rowswap}):
+\begin{align*}
+R &=
+  \begin{bmatrix}
+ r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
+ 0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
+ 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
+ 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
+ 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
+\end{bmatrix}
+\xrightarrow{r_{2} \leftrightarrow r_{5}}
+\begin{bmatrix}
+% \begin{array}{cc:cc:cc}
+ r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
+ 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
+ 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ % \cdashline{1-8}
+ 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
+ 0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
+ 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
+% \end{array}
+\end{bmatrix}
+\end{align*}\\
+Next, partition it into \ $R_{upper}, \ R_{lower}$:
+ \begin{align*}
+ \begin{bmatrix}
+ r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
+ 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
+ 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ \cdashline{1-8}
+ 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
+ 0      & r_{22}  & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
+ 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
+\end{bmatrix}
+\end{align*}
+ Both \( R_{upper} \) and \( R_{lower} \) have an odd number of rows,
+we append a zero row to the end of the last row of \( R_{upper} \) and prepend a zero row to the beginning of the first row of \( R_{lower} \):
+% \xrightarrow{add\ zero\ rows}
+\begin{align*}
+\begin{bmatrix}
+ r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
+ 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
+ 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ 0      & 0      & 0      & 0      & 0      & 0      & 0      & 0     \\
+ \cdashline{1-8}
+ 0      & 0      & 0      & 0      & 0      & 0      & 0      & 0     \\
+ 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
+ 0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
+ 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
+\end{bmatrix} 
+\end{align*}
+Next, we follow  \eqref{eq:rowswap} again to perform row swaps
+on $R_{upper}, \ R_{lower}$ separately:
+% &\xrightarrow{partition\ to\ R_{upper},\ R_{lower}}
+\begin{align*}
+\xrightarrow[r_{2} \leftrightarrow r_{3}\ on\ R_{lower}]{r_{2} \leftrightarrow r_{3}\ on\ R_{upper}}
+&\begin{bmatrix}
+ r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
+ 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
+ 0      & 0      & 0      & 0      & 0      & 0      &  0     & 0     \\
+\cdashline{1-8}
+ 0      & 0      & 0      & 0      & 0      & 0      & 0      & 0     \\
+ 0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
+ 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
+ 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
+\end{bmatrix}
+\end{align*}\\
+Due to all partitioned submatrices having exactly 2 rows after further partitioning, row permations are terminated. And then remove the added zero rows to keep the same size:
+\begin{align*}
+% \xrightarrow{remove\ zero\ rows}
+&\begin{bmatrix}
+ r_{11} & r_{12} & r_{13} & r_{14} & r_{15} & r_{16} & r_{17} & r_{18}\\
+ 0      & 0      & r_{33} & r_{34} & r_{35} & r_{36} & r_{37} & r_{38}\\
+ 0      & 0      & 0      & 0      & r_{55} & r_{56} & r_{57} & r_{58}\\
+ 0      & r_{22} & r_{23} & r_{24} & r_{25} & r_{26} & r_{27} & r_{28}\\
+ 0      & 0      & 0      & r_{44} & r_{45} & r_{46} & r_{47} & r_{48}\\
+ 0      & 0      & 0      & 0      & 0      & r_{66} & r_{67} & r_{68}\\
+\end{bmatrix}
+\end{align*}
+Now we proceed by performing column swaps on the above resulting matrix, following (\ref{eq:cswap}):
+\begin{align*}
+\xrightarrow{c_{2} \leftrightarrow c_{5}}
+&\begin{bmatrix}
+ r_{11} & r_{15} & r_{13} & r_{14} &  r_{12} & r_{16} & r_{17} & r_{18}\\
+ 0      & r_{35} & r_{33} & r_{34} &  0      & r_{36} & r_{37} & r_{38}\\
+ 0      & r_{55} & 0      & 0      &  0      & r_{56} & r_{57} & r_{58}\\
+ 0      & r_{25} & r_{23} & r_{24} &  r_{22} & r_{26} & r_{27} & r_{28}\\
+ 0      & r_{45} & 0      & r_{44} &  0      & r_{46} & r_{47} & r_{48}\\
+ 0      & 0      & 0      & 0      &  0      & r_{66} & r_{67} & r_{68}\\
+\end{bmatrix}
+\end{align*}
+\begin{align*}
+\xrightarrow{c_{4} \leftrightarrow c_{7}}
+&\begin{bmatrix}
+ r_{11} & r_{15} & r_{13} & r_{17} & r_{12} & r_{16} & r_{14} & r_{18}\\
+ 0      & r_{35} & r_{33} & r_{37} & 0      & r_{36} & r_{34} & r_{38}\\
+ 0      & r_{55} & 0      & r_{57} & 0      & r_{56} & 0      & r_{58}\\
+ 0      & r_{25} & r_{23} & r_{27} & r_{22} & r_{26} & r_{24} & r_{28}\\
+ 0      & r_{45} & 0      & r_{47} & 0      & r_{46} & r_{44} & r_{48}\\
+ 0      & 0      & 0      & r_{67} & 0      & r_{66} & 0      & r_{68}\\
+\end{bmatrix}\end{align*}
+Partition the matrix into \ $R_{left}, \ R_{right}$:
+ \begin{align*}
+% \xrightarrow{partition\ to\ R_{left},\ R_{right}}
+&\begin{bmatrix}
+\begin{array}{cccc:cccc}
+ r_{11} & r_{15} & r_{13} & r_{17} & r_{12} & r_{16} & r_{14} & r_{18}\\
+ 0      & r_{35} & r_{33} & r_{37} & 0      & r_{36} & r_{34} & r_{38}\\
+ 0      & r_{55} & 0      & r_{57} & 0      & r_{56} & 0      & r_{58}\\
+ 0      & r_{25} & r_{23} & r_{27} & r_{22} & r_{26} & r_{24} & r_{28}\\
+ 0      & r_{45} & 0      & r_{47} & 0      & r_{46} & r_{44} & r_{48}\\
+ 0      & 0      & 0      & r_{67} & 0      & r_{66} & 0      & r_{68}\\
+\end{array}
+\end{bmatrix}
+\end{align*}
+Next, we follow  \eqref{eq:cswap} again to perform column swaps
+on $R_{left}, \ R_{right}$ separately:
+\begin{align*}
+\xrightarrow[c_{2} \leftrightarrow c_{3}\ in\ R_{right}]{c_{2} \leftrightarrow c_{3}\ in\ R_{left}}
+&\begin{bmatrix}
+\begin{array}{cccc:cccc}
+ r_{11} & r_{13} & r_{15} & r_{17} & r_{12} & r_{14} & r_{16} & r_{18}\\
+ 0      & r_{33} & r_{35} & r_{37} & 0      & r_{34} & r_{36} & r_{38}\\
+ 0      & 0      & r_{55} & r_{57} & 0      & 0      & r_{56} & r_{58}\\
+ % \cdashline{1-8}
+ 0      & r_{23} & r_{25} & r_{27} & r_{22} & r_{24} & r_{26} & r_{28}\\
+ 0      & 0      & r_{45} & r_{47} & 0      & r_{44} & r_{46} & r_{48}\\
+ 0      & 0      & 0      & r_{67} & 0      & 0      & r_{66} & r_{68}\\
+\end{array}
+\end{bmatrix}.
+\end{align*}
+Due to all partitioned submatrices having exactly 2 columns after further partitioning, column permations are terminated. Finally, partition the matrix into \(R_{11}, \ R_{12}, \ R_{21}, \ R_{22}\):
+\begin{align*}
+% \xrightarrow{partition \ to \ R_{11}, \ R_{12}, \ R_{21}, \ R_{22}}
+&\begin{bmatrix}
+\begin{array}{cccc:cccc}
+ r_{11} & r_{13} & r_{15} & r_{17} & r_{12} & r_{14} & r_{16} & r_{18}\\
+ 0      & r_{33} & r_{35} & r_{37} & 0      & r_{34} & r_{36} & r_{38}\\
+ 0      & 0      & r_{55} & r_{57} & 0      & 0      & r_{56} & r_{58}\\
+ \cdashline{1-8}
+ 0      & r_{23} & r_{25} & r_{27} & r_{22} & r_{24} & r_{26} & r_{28}\\
+ 0      & 0      & r_{45} & r_{47} & 0      & r_{44} & r_{46} & r_{48}\\
+ 0      & 0      & 0      & r_{67} & 0      & 0      & r_{66} & r_{68}\\
+\end{array}
+\end{bmatrix} 
+=\begin{bmatrix}
+    R_{11} & R_{12}\\R_{21} & R_{22}
+\end{bmatrix} = R_4.
+\end{align*}
 
 \iffalse
 \begin{align*}
@@ -512,13 +735,13 @@ The above process applies to any upper triangular matrices $R$ with even orders 
 \fi
 By the properties of the row and column transformations, we can check that the relationship between $R$ and $R_4$ is as follows:
 \begin{equation}\label{eq:Rn}
-    P_{m} R P_{n}^T = \begin{bmatrix} R_{11} & R_{12}\\R_{21}& R_{22}\end{bmatrix}.
+    P_{2m} R P_{2n}^T = \begin{bmatrix} R_{11} & R_{12}\\R_{21}& R_{22}\end{bmatrix}.
 \end{equation}
 
-To obtain the matrix $P_k, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, we established Algorithm \cref{alg:Permutation} when the input is $P=I_{2k}$, and obtain the permutation matrix $P_k$:
+To obtain the matrix $P_{2k}, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, we \iffalse established Algorithm \cref{alg:Permutation} when\fi take the input as $P=I_{2k}$ in Algorithm \cref{alg:Permutation}, and then it yields the permutation matrix $P_{2k}$:
 
 \begin{equation}\label{p}
-    P_k = \begin{bmatrix} 
+    P_{2k} = \begin{bmatrix} 
             1 & 0 & 0 & 0 & \cdots & 0 & 0\\ 
             0 & 0 & 1 & 0 & \cdots & 0 & 0\\ 
             \vdots & \vdots & \vdots & \vdots &  & \vdots & \vdots\\ 
@@ -530,27 +753,13 @@ To obtain the matrix $P_k, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, 
         \end{bmatrix}_{2k \times 2k}.
 \end{equation}
 
-\iffalse
-{\color{red}As we can observe from the example, to achieve the process described by Figure 1, we only need to place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) rows of the resulting matrix.  Next, perform column operations on the resulting matrix, place the columns (1, 3, 5, 7, 2, 4, 6, 8) of the resulting matrix respectively to the columns (1, 2, 3, 4, 5, 6, 7, 8). This $P_k$ and \eqref{eq:Rn} can also explain why we perform aforesaid operations on $R$. Based on this, we propose an optimized version of Algorithm 1, that is Algorithm 2. By using $R=\text{PermutationOpt}(R,0)$, one can  obtain $R_4$, which satisfies \eqref{eq:Rn}.}
+\iffalse 
+perform the following row and column swaps on matrix $R$:  
+  Replace the odd rows (1, 3, 5) sequentially with the first three rows. Replace the even rows (2, 4, 6) sequentially with the last three rows. Replace the odd columns (1, 3, 5) sequentially with the first three columns. Replace the even columns (2, 4, 6) sequentially with the last three columns.
+  \fi
+  \iffalse
+As we can observe from the example, to achieve the process described by Figure 1, we only need to place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) rows of the resulting matrix.  Next, perform column operations on the resulting matrix, place the columns (1, 3, 5, 7, 2, 4, 6, 8) of the resulting matrix respectively to the columns (1, 2, 3, 4, 5, 6, 7, 8). This $P_k$ and \eqref{eq:Rn} can also explain why we perform aforesaid operations on $R$. \iffalse Based on this, we propose an optimized version of Algorithm 1, that is Algorithm 2. By first using $R=\text{PermutationOpt}(R,0)$ and then using $R_4=(\text{PermutationOpt}(R',0))'$, then one can  obtain $R_4$, which satisfies \eqref{eq:Rn}. Here, $R'$ in MATLAB means the transpose matrix of $R$.\fi
 \fi
-
-
-After completing the above steps, we can now proceed to implement the decomposition \eqref{splitqr}.
-First, perform the QR decomposition:
-\[P_m^TA^\sigma P_n = \widehat{Q}\widehat{R}.\]
-According to \eqref{eq:Rn}, we have
-\[P_m^TA^\sigma P_n = \widehat{Q}\widehat{R} = \widehat{Q}(P_m^TR_4P_n).\]
-Multiplying both sides of the equation by $P_m$ on the left and $P_n^T$ on the right yields
-\[A^\sigma=P_m\widehat{Q}P_m^T R_4.\]
- Since $P_m$ is a permutation matrix, it is also an orthogonal matrix. Thus, the product of matrices, $P_m\widehat{Q}P_m^T$, is also an orthogonal matrix. Then we get our required special decomposition \[A^\sigma=\widetilde{Q}R_4,\] where $\widetilde{Q}=P_m\widehat{Q}P_m^T$ is orthogonal, and $R_4$ is in the form of \eqref{r4}. During the process, we need to compute 
-$P_m^TA^\sigma P_n, P_m\widehat{Q}P_m^T, P_m \widehat{R}P_n^T$. 
-
-{\color{red}As we can observe from the form of $P$ and above example, we only need to place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) rows of the resulting matrix. Next, perform column operations on the resulting matrix, place the columns (1, 3, 5, 7, 2, 4, 6, 8) of the resulting matrix into the columns (1, 2, 3, 4, 5, 6, 7, 8) respectively to obtain $R_4$.\iffalse This $P_k$ and \eqref{eq:Rn} can also explain why we perform aforesaid operations on $R$. Based on this, we propose an optimized version of Algorithm 1, that is Algorithm 2. By using $R=\text{PermutationOpt}(R,0)$, one can  obtain $R_4$, which satisfies \eqref{eq:Rn}.\fi}
-So to reduce computational cost, we designed Algorithm \cref{alg:Permutation Optimization} to avoid multiplication operations on $A^\sigma, \widehat{Q}, \widehat{R}$.
-\iffalse
-{\color{red}To reduce computational cost, we designed Algorithm \cref{alg:Permutation Optimization}, which avoids multiplication operations on $A^\sigma, \widehat{R}, \widehat{Q}$.}\fi
-
-% \end{multicols}
 \begin{algorithm}[htbp]
     \caption{Matrix Permutation Recursive Algorithm} \label{alg:Permutation}
     \begin{algorithmic}[1]
@@ -600,42 +809,30 @@ So to reduce computational cost, we designed Algorithm \cref{alg:Permutation Opt
     \end{algorithmic}
 \end{algorithm}
 
-\iffalse
-\begin{algorithm}[htbp]
-    \caption{Matrix Permutation Optimization Algorithm}
-    \label{alg:Permutation Optimization}
-    \begin{algorithmic}[1]
-    \Function{PermutationOpt}{$A,t$}
-        \State \% \textbf{Input:} \textit{$ A\in \mathbb{R}^{2m\times 2n}$, $t$ is 0 or 1.}
-        \State \% \textbf{Output:} \textit{$B \in\mathbb{R}^{2m\times 2n}$, such that $B=P_mA$ when $t$ is $0$;  $B=P_m^TA$ when $t$ is $1$.}
-        \State
-        \If {$t == 0$}
-            \State \% \textit{Assign odd rows of $A$ sequentially to the $1$st-$m$th rows of $B$; }
-            \State \% \textit{even rows of $A$ sequentially to the $(m+1)$th-$2m$th rows of $B$.}
-            \For {$i = 1:m$}
-                \State $B(i, :) = A(2*i-1, :);$
-                \State $B(m+i, :) = A(2*i, :);$
-            \End
-        \Else  
-            \State \% \textit{Assign $A$'s $1$th--$m$th rows sequentially to odd rows of $B$;}
-            \State \% \textit{$A$'s $(m+1)$th--$2m$th rows sequentially to even rows of $B$.}
-            \For {$i = 1:m$}
-                \State $B(2*i-1, :) = A(i, :);$
-                \State $B(2*i, :) = A(m+i, :);$
-            \End
-        \End
-    \End 
-    \end{algorithmic}
-\end{algorithm}
-\fi
 
+After completing the above steps, we can now  implement the decomposition \eqref{splitqr}.
+First, perform the QR decomposition:
+\[P_{2m}^TA^\sigma P_{2n} = \widehat{Q}\widehat{R}.\]
+According to \eqref{eq:Rn}, we have
+\[P_{2m}^TA^\sigma P_{2n} = \widehat{Q}\widehat{R} = \widehat{Q}(P_{2m}^TR_4P_{2n}).\]
+Multiplying both sides of the equation by $P_{2m}$ on the left and $P_{2n}^T$ on the right yields
+\[A^\sigma=P_{2m}\widehat{Q}P_{2m}^T R_4.\]
+ Since $P_{2m}$ is a permutation matrix, it is also an orthogonal matrix. Thus, the product of matrices, $P_{2m}\widehat{Q}P_{2m}^T$, is also an orthogonal matrix. Then we get our required special decomposition \[A^\sigma=\widetilde{Q}R_4,\] where $\widetilde{Q}=P_{2m}\widehat{Q}P_{2m}^T$ is orthogonal, and $R_4$ is in the form of \eqref{r4}. During the process, we need to compute 
+$P_{2m}^TA^\sigma P_{2n}, P_{2m}\widehat{Q}P_{2m}^T,$ and $ P_{2m} \widehat{R}P_{2n}^T$. 
+
+As we can observe from the form of $P$ and the above example, we only need to place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) rows of the resulting matrix. Next, perform column operations on the resulting matrix, place the columns (1, 3, 5, 7, 2, 4, 6, 8) of the resulting matrix into the columns (1, 2, 3, 4, 5, 6, 7, 8) respectively to obtain $R_4$.\iffalse This $P_k$ and \eqref{eq:Rn} can also explain why we perform aforesaid operations on $R$. Based on this, we propose an optimized version of Algorithm 1, that is Algorithm 2. By using $R=\text{PermutationOpt}(R,0)$, one can  obtain $R_4$, which satisfies \eqref{eq:Rn}.\fi
+ So to reduce computational cost, we designe \cref{alg:Permutation Optimization} to avoid multiplication operations on $A^\sigma, \widehat{Q}, $ and $ \widehat{R}$.
+\iffalse
+To reduce computational cost, we designed Algorithm \cref{alg:Permutation Optimization} to avoid multiplication operations on $A^\sigma, \widehat{Q}, \widehat{R}$.
+
+{\color{red}To reduce computational cost, we designed Algorithm \cref{alg:Permutation Optimization}, which avoids multiplication operations on $A^\sigma, \widehat{R}, \widehat{Q}$.}\fi
 \begin{algorithm}[htbp]
     \caption{Matrix Permutation Optimization Algorithm}
     \label{alg:Permutation Optimization}
     \begin{algorithmic}[1]
     \Function{PermutationOpt}{$A,t$}
         \State \% \textbf{Input:} \textit{$ A\in \mathbb{R}^{2m\times 2n}$, $t$ is 0 or 1.}
-        \State \% \textbf{Output:} \textit{$B \in\mathbb{R}^{2m\times 2n}$, such that $B=P_mAP_n^T$ when $t$ is $0$;  $B=P_m^TAP_n$ when $t$ is $1$.}
+        \State \% \textbf{Output:} \textit{$B \in\mathbb{R}^{2m\times 2n}$, such that $B=P_{2m}AP_{2n}^T$ when $t$ is $0$;  $B=P_{2m}^TAP_{2n}$ when $t$ is $1$.}
         \State
         \If {$t == 0$}
             \State \% \textit{Assign odd rows of $A$ sequentially to the $1$st-$m$th rows of $A_{tmp}$; }
@@ -667,50 +864,21 @@ So to reduce computational cost, we designed Algorithm \cref{alg:Permutation Opt
     \End 
     \end{algorithmic}
 \end{algorithm}
+\vspace{.3cm}
 
-% \begin{multicols}{2}
-\textbf{Step 2:} Using equation \eqref{eq:2.3}, construct the matrix $R$ such that $R^\sigma=R_4:$
+\noindent \textbf{Step 2:} We are now in a position to construct split quaternion matrices $Q$ and $R$.
+Using equation \eqref{eq:2.3}, we construct the matrix $R$ such that $R^\sigma=R_4$ by:
 \begin{equation*}
 R = \frac{R_{11} + R_{22}}{2} + \frac{R_{21} - R_{12}}{2}i + \frac{R_{11} - R_{22}}{2}j + \frac{R_{21} + R_{12}}{2}k,
 \end{equation*}
-Since $R_{11}, R_{12}, R_{21}, R_{22}$ are upper triangular, this ensures that the constructed split quaternion matrix $R$ is also upper triangular. Additionally, construct the matrix $Q$ such that $Q^\sigma=\widetilde{Q}:$
+Since $R_{11}, R_{12}, R_{21}, R_{22}$ are upper triangular, this ensures that the constructed split quaternion matrix $R$ is also upper triangular. Additionally, construct the matrix $Q$ such that $Q^\sigma=\widetilde{Q}$ by:
 \begin{equation*}
 Q = \frac{Q_{11} + Q_{22}}{2} + \frac{Q_{21} - Q_{12}}{2}i + \frac{Q_{11} - Q_{22}}{2}j + \frac{Q_{21} + Q_{12}}{2}k,
 \end{equation*}
 where $Q_{11}, Q_{12}, Q_{21}, Q_{22} \in \mathbb{R}^{m \times n}$ are the blocks of the orthogonal matrix $\widetilde{Q} = \begin{bmatrix} Q_{11} & Q_{12} \\ Q_{21} & Q_{22} \end{bmatrix} \in \mathbb{R}^{2m \times 2m}$. Note that \[(Q^H Q)^\sigma = {(Q^H)}^\sigma Q^\sigma = {(Q^\sigma)}^TQ^\sigma = \widetilde{Q}^T\widetilde{Q} = I_{2m},\] indicating that the split quaternion matrix $Q$ remains a unitary matrix.
-
 Now, $A^\sigma=\widetilde{Q}R_4=Q^\sigma R^\sigma$ implies
 $A = Q R$, as required.
-
-From the process described above, any split quaternion matrix can be decomposed into QR decomposition. Our results can be summarized as follows:
-\begin{theorem}(QR Decomposition)
-    Let $A \in \mathbb{H}_s^{m \times n}$. There exist a unitary matrix $Q \in \mathbb{H}_s^{m \times m}$ and an upper triangular matrix $R \in \mathbb{H}_s^{m \times n}$ such that
-    \begin{eqnarray}\label{eq:split QR}
-        A = Q R.
-    \end{eqnarray}
-\end{theorem}
-% \iffalse
-% To reduce the computational cost, we designed Algorithm \cref{alg:Permutation Optimization}, which avoids multiplication operations on $\widehat{A}, \widehat{R}, \widehat{Q}$.
-
-\textbf{Complexity Analysis:}
-{Complexity Analysis:} For a split quaternion matrix $A = A_0 + A_1i + A_2j + A_3k \in \mathbb{H}_s^{m \times n}$, the computational complexity of Algorithm \cref{alg:QR} is dominated by three components:  
-
-\textbf{1. Real Representation Conversion:}
-Constructing the real representation $A^\sigma \in \mathbb{R}^{2m \times 2n}$ requires about $4mn$ flops. 
-
-\textbf{2. Permutations On $A^\sigma, \widehat{Q}, \widehat{R}$:}
-By using Algorithm \cref{alg:Permutation Optimization},  which requires approximately  $(8m+4n)$ flops.
-
-\textbf{3. Real Matrix QR Decomposition:}
-The QR decomposition of $A^\sigma \in \mathbb{R}^{2m \times 2n}$ using Householder reflections dominates the complexity at $16(mn^2-\frac{n^3}{3})$ flops.
-
-\textbf{Total Complexity}
-$$
-\underbrace{(4mn)}_{\text{Real Rep.}} + \underbrace{(8m+4n)}_{\substack{\text{Permutation} \\ \text{(optimized)}}} + \underbrace{(16(mn^2-\frac{n^3}{3}))}_{\text{QR}} \approx \boxed{(16(mn^2-\frac{n^3}{3}))}
-$$  
-% \fi
-
-\iffalse
+ 
 \begin{algorithm}[htbp] 
     \caption{Compute the QR of Split Quaternion Matrix \(A\)}
     \label{alg:QR}
@@ -726,59 +894,7 @@ $$
             \end{bmatrix} \in \mathbb{R}^{2m\times 2n}\); 
         
         \State
-        \State \% \textbf{Step 2} \textit{Compute \(\widehat{A} = P_{m}^T A^\sigma P_{n}\).}
-        \State $\widehat{A}=\text{PermutationOpt}(A^\sigma,1);$  
-        \State $\widehat{A}=\text{PermutationOpt}(\widehat{A}',1),\widehat{A}=\widehat{A}';$
-        
-        \State
-        \State \% \textbf{Step 3} Compute QR of $\widehat{A}$.
-        \State \([\widehat{Q},\widehat{R}] = \text{qr}(\widehat{A})\); 
-        
-        \State
-        \State \% \textbf{Step 4} \textit{Compute \(R^\sigma = P_{m}\widehat{R}P_{n}^T\), \(Q^\sigma = P_{m}\widehat{Q}P_{m}^T\). }
-        \State $\widehat{R}=\text{PermutationOpt}(\widehat{R},0)$; 
-        \State $\widehat{R}=\text{PermutationOpt}(\widehat{R}',0)$;
-        \State $R^\sigma=\widehat{R}'$;
-        \State $\widehat{Q}=\text{PermutationOpt}(\widehat{Q},0)$;
-        \State $\widehat{Q}=\text{PermutationOpt}(\widehat{Q}',0)$;
-        \State $Q^\sigma=\widehat{Q}'$;
-        
-        \State
-        \State \% \textbf{Step 5} \textit{Construct matrix Q, R.}
-        \State $Q_0 = (Q^\sigma(1\!:\!m,1\!:\!m) + Q^\sigma(m+1\!:\!2m,m+1\!:\!2m))/2$;
-        \State $Q_1 = (Q^\sigma(m+1\!:\!2m,1\!:\!m) - Q^\sigma(1\!:\!m,m+1\!:\!2m))/2$;
-        \State $Q_2 = (Q^\sigma(1\!:\!m,1\!:\!m) - Q^\sigma(m+1\!:\!2m,m+1\!:\!2m))/2$;
-        \State $Q_3 = (Q^\sigma(m+1\!:\!2m,1\!:\!m) + Q^\sigma(1\!:\!m,m+1\!:\!2m))/2$;
-        \State $R_0 = (R^\sigma(1\!:\!m,1\!:\!n) + R^\sigma(m+1\!:\!2m,n+1\!:\!2n))/2$;
-        \State $R_1 = (R^\sigma(m+1\!:\!2m,1\!:\!n) - R^\sigma(1\!:\!m,n+1\!:\!2n))/2$;
-        \State $R_2 = (R^\sigma(1\!:\!m,1\!:\!n) - R^\sigma(m+1\!:\!2m,n+1\!:\!2n))/2$;
-        \State $R_3 = (R^\sigma(m+1\!:\!2m,1\!:\!n) + R^\sigma(1\!:\!m,n+1\!:\!2n))/2$;
-
-        \State
-        \State \% \textbf{Step 6} \textit{Return $Q, R$}.
-        \State $Q = Q_0 + Q_1i + Q_2j + Q_3k$; 
-        \State $R = R_0 + R_1i + R_2j + R_3k$;
-    \End 
-    \end{algorithmic}
-\end{algorithm}
-\fi
-
-\begin{algorithm}[htbp] 
-    \caption{Compute the QR of Split Quaternion Matrix \(A\)}
-    \label{alg:QR}
-    \begin{algorithmic}[1]
-    \Function{Split-QR}{$A$}
-        \State \% \textbf{Input:} \textit{\(A = A_0 + A_1 i + A_2 j + A_3 k \in \mathbb{H}_s^{m\times n}\).}
-        \State \% \textbf{Output:} \textit{Unitary matrix \(Q \in \mathbb{H}_s^{m\times m}\), upper triangular matrix \(R \in \mathbb{H}_s^{m\times n}\), satisfying \(Q  R = A\).}
-        \State
-        \State \% \textbf{Step 1} \textit{Real representation of $A$.}
-        \State \(A^\sigma = \begin{bmatrix}
-            A_0 + A_2 & -A_1 + A_3 \\ 
-            A_1 + A_3 & A_0 - A_2
-            \end{bmatrix} \in \mathbb{R}^{2m\times 2n}\); 
-        
-        \State
-        \State \% \textbf{Step 2} \textit{Compute \(\widehat{A} = P_{m}^T A^\sigma P_{n}\).}
+        \State \% \textbf{Step 2} \textit{Compute \(\widehat{A} = P_{2m}^T A^\sigma P_{2n}\).}
         \State $\widehat{A}=\text{PermutationOpt}(A^\sigma,1);$  
         
         \State
@@ -786,7 +902,7 @@ $$
         \State \([\widehat{Q},\widehat{R}] = \text{qr}(\widehat{A})\); 
         
         \State
-        \State \% \textbf{Step 4} \textit{Compute \(R^\sigma = P_{m}\widehat{R}P_{n}^T\), \(Q^\sigma = P_{m}\widehat{Q}P_{m}^T\). }
+        \State \% \textbf{Step 4} \textit{Compute \(R^\sigma = P_{2m}\widehat{R}P_{2n}^T\), \(Q^\sigma = P_{2m}\widehat{Q}P_{2m}^T\). }
         \State $\widehat{R}=\text{PermutationOpt}(\widehat{R},0)$;
         \State $\widehat{Q}=\text{PermutationOpt}(\widehat{Q},0)$;
         
@@ -808,12 +924,42 @@ $$
     \End 
     \end{algorithmic}
 \end{algorithm}
-% \begin{multicols}{2}
 
+From the process described above, any split quaternion matrix can be decomposed into QR decomposition. Our results can be summarized as follows:
+\begin{theorem}(QR Decomposition)
+    Let $A \in \mathbb{H}_s^{m \times n}$. Then there exist a unitary matrix $Q \in \mathbb{H}_s^{m \times m}$ and an upper triangular matrix $R \in \mathbb{H}_s^{m \times n}$ such that
+    \begin{eqnarray}\label{eq:split QR}
+        A = Q R.
+    \end{eqnarray}
+\end{theorem}
+% \iffalse
+% To reduce the computational cost, we designed Algorithm \cref{alg:Permutation Optimization}, which avoids multiplication operations on $\widehat{A}, \widehat{R}, \widehat{Q}$.
+
+\noindent \textbf{Complexity Analysis:}
+{Complexity Analysis:} For a split quaternion matrix $A = A_0 + A_1i + A_2j + A_3k \in \mathbb{H}_s^{m \times n}$, the computational complexity of \cref{alg:QR} is dominated by three components:  
+
+\begin{itemize}
+\item[(i)] \textbf{Real Representation Conversion:}
+Constructing the real representation $A^\sigma \in \mathbb{R}^{2m \times 2n}$ requires about $4mn$ flops. 
+
+\item[(ii)] \textbf{Permutations on $A^\sigma, \widehat{Q}, \widehat{R}$:}
+By using \cref{alg:Permutation Optimization},  which requires approximately  $(8m+4n)$ flops.
+
+\item[(iii)] \textbf{Real Matrix QR Decomposition:}
+The QR decomposition of $A^\sigma \in \mathbb{R}^{2m \times 2n}$ using Householder reflections dominates the complexity at $16(mn^2-\frac{n^3}{3})$ flops.
+\end{itemize}
+
+\noindent \textbf{Total Complexity}
+$$
+\underbrace{(4mn)}_{\text{Real Rep.}} + \underbrace{(8m+4n)}_{\substack{\text{Permutation} \\ \text{(optimized)}}} + \underbrace{(16(mn^2-\frac{n^3}{3}))}_{\text{QR}} \approx \boxed{(16(mn^2-\frac{n^3}{3}))}
+$$  
+% \fi
 
 \section{Numerical Examples}
-\iffalse In this section,  we will use the proposed Algorithm 2 to compute the QR decomposition for split quaternion matrices and apply it to solving a matrix equation.\fi
-In this section, we will use the proposed Algorithm \cref{alg:QR} to compute the QR decomposition for split quaternion matrices.
+\iffalse 
+In this section,  we will use the proposed Algorithm 2 to compute the QR decomposition for split quaternion matrices and apply it to solving a matrix equation.
+\fi
+In this section, we first use \cref{alg:QR} to compute the QR decomposition for split quaternion matrices to show  efficiency and accuracy.
 \begin{example}
     Given a split quaternion matrix $A = A_{0}+A_{1}i+A_{2}j+A_{3}k\in \mathbb{H}_s^{m\times n}$, where
     \begin{equation}
@@ -827,10 +973,10 @@ In this section, we will use the proposed Algorithm \cref{alg:QR} to compute the
         \end{cases} \label{eq:example2}
     \end{equation}
 \end{example}
-Here, the MATLAB function $rand(m,n)$ is used to generate a $m \times n$ real matrix with random elements that fall within the interval (0,1).  All experiments were performed and computed using MATLAB 2024a on a system equipped with an 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz processor, 16.0 GB RAM and Windows 11 Pro. We executed Algorithm \cref{alg:QR} to perform the QR decomposition on $A$, and have calculated the CPU time and the relative error
+Here, the MATLAB function $rand(m,n)$ is used to generate a $m \times n$ real matrix with random elements that fall within the interval (0,1).  All experiments were performed and computed using MATLAB 2024a on a system equipped with an 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz processor, 16.0 GB RAM and Windows 11 Pro. We executed \cref{alg:QR} to perform the QR decomposition on $A$, and have calculated the CPU time and the relative error
 $\epsilon = \frac{\left\|A - Q R\right\|_{F}}{\|A\|_{F}}.$
-The experimental results from \cref{fig:Figure_2} show that Algorithm \cref{alg:QR} performs quite well in both speed and accuracy. 
-\begin{figure}[H]
+The experimental results from \cref{fig:Figure_2} show that \cref{alg:QR} performs quite well in both speed and accuracy. 
+\begin{figure}[htbp]
     \centering
     \begin{minipage}[b]{0.45\textwidth}
         \centering
@@ -852,7 +998,7 @@ In the following, we will discuss the application of QR decomposition in solving
 \begin{example}
 Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$, where
 \begin{align*}
-  A &=
+  & A =
     \begin{bmatrix}
     -4 & -2 & -8 \\
     -2 & -2 & -5 \\
@@ -862,8 +1008,8 @@ Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$,
     -1 & -2 &  4 \\
     -5 & -8 & -5 \\
     -4 &  0 &  6
-    \end{bmatrix} i \\
-    &+ 
+    \end{bmatrix} i 
+    + 
     \begin{bmatrix}
     -9  & -6  & -8 \\
     -2  & -10 & -5 \\
@@ -873,10 +1019,10 @@ Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$,
     -8 &  9 & -3 \\
      2 & -6 &  0 \\
      8 &  0 & -5
-    \end{bmatrix} k,
-\end{align*}
-\begin{align*}
-  B &=
+    \end{bmatrix} k,\\
+% \end{align*}
+% \begin{align*}
+  & B =
     \begin{bmatrix}
     -9 & -10 &  10 \\
     -1 &  10 &  6 \\
@@ -886,8 +1032,8 @@ Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$,
     4 &  1 & -6 \\
     4 & -6 & -3 \\
     3 &  6 &  8
-    \end{bmatrix} i \\
-    &+
+    \end{bmatrix} i 
+    +
     \begin{bmatrix}
      7 & 2 &  2 \\
     -2 & 9 & -4 \\
@@ -904,7 +1050,7 @@ Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$,
 First, using Algorithm \cref{alg:QR} to perform QR decomposition on $A$ to obtain $Q$ and $R:$
 \setlength{\jot}{2pt}
 \setlength{\arraycolsep}{1pt}
-% {\footnotesize
+%{\footnotesize
 \begin{align*}
   Q &=
      \begin{bmatrix}
@@ -916,8 +1062,8 @@ First, using Algorithm \cref{alg:QR} to perform QR decomposition on $A$ to obtai
     -0.363 &  0.479 &  0.122 \\
      0.077 & -0.458 & -0.100 \\
      0.383 & -0.194 &  0.138
-    \end{bmatrix} i \\
-    & + 
+    \end{bmatrix} i\\
+    &+ 
     \begin{bmatrix}
     -0.236 & -0.062 & -0.155 \\
     -0.105 &  0.031 &  0.403 \\
@@ -928,10 +1074,10 @@ First, using Algorithm \cref{alg:QR} to perform QR decomposition on $A$ to obtai
     -0.250 & -0.133 &  0.577 \\
     -0.152 &  0.291 & -0.343
     \end{bmatrix} k,
-\end{align*}
-\begin{align*}
+    \end{align*}
+    \begin{align*}
   R &=
-     \begin{bmatrix}
+    \begin{bmatrix}
     -3.041 & 3.419 & 10.927 \\
      0     & 6.061 & 6.456 \\
      0     & 0     & 7.714
@@ -940,7 +1086,7 @@ First, using Algorithm \cref{alg:QR} to perform QR decomposition on $A$ to obtai
     -1.443 & 8.617 &  1.053 \\
      0     & 1.847 & -2.947 \\
      0     & 0     & -5.025
-    \end{bmatrix} i \\
+    \end{bmatrix} i\\
     &+ 
     \begin{bmatrix}
     20.361 & 5.876  & 6.740 \\
@@ -953,7 +1099,7 @@ First, using Algorithm \cref{alg:QR} to perform QR decomposition on $A$ to obtai
     0     &  0     &  5.025
     \end{bmatrix} k.
 \end{align*}
-% }
+%}
 Thus, the equation can be rewritten as
 \begin{equation}
     QRX = B.\label{eq:example1}
@@ -961,10 +1107,10 @@ Thus, the equation can be rewritten as
 
 Since $Q$ is a unitary matrix, multiplying both sides of \eqref{eq:example1} by $Q^H$ from the left yields $RX = Q^HB\triangleq \widehat{B}$,
 where
-% {\footnotesize
+%{\footnotesize
 \begin{align*}
   \widehat{B} &=
-    \begin{bmatrix}
+     \begin{bmatrix}
      4.981  &  6.383  &  8.076 \\
     -2.019  & -1.922  & -1.440 \\
      11.356 &  10.929 & -9.652
@@ -973,7 +1119,8 @@ where
     -1.144 & -7.725  &  6.206 \\
      1.152 &  11.947 & -2.239 \\
     -3.761 &  0.482  & -0.749
-    \end{bmatrix} i \\ &+
+    \end{bmatrix} i \\
+    &+
     \begin{bmatrix}
     -6.136 & -7.249 & -9.693 \\
      0.310 & -4.646 &  0.574 \\
@@ -985,9 +1132,9 @@ where
     -0.653  &  6.826 &  12.841
     \end{bmatrix} k.
 \end{align*}
-% }
+%}
 Note that $R$ is an upper triangular matrix. Thus, $RX = Q^HB\triangleq \widehat{B}$ can be solved using back substitution:
-% {\footnotesize
+%{\footnotesize
  \begin{align*}
   X &=
     \begin{bmatrix}
@@ -999,7 +1146,8 @@ Note that $R$ is an upper triangular matrix. Thus, $RX = Q^HB\triangleq \widehat
     -1.116 & -0.337 &  0.999 \\
     -0.423 & -0.961 &  1.907 \\
      0.349 &  1.315 & -0.403
-    \end{bmatrix} i \\ &+
+    \end{bmatrix} i\\
+    &+
     \begin{bmatrix}
     -0.456 & -0.123 &  1.793 \\
     -1.222 & -0.449 &  1.810 \\
@@ -1011,45 +1159,55 @@ Note that $R$ is an upper triangular matrix. Thus, $RX = Q^HB\triangleq \widehat
     -0.989 & -0.256 &  2.156
     \end{bmatrix} k.
 \end{align*}
-% }
+%}
 And the relative error is $\frac{\|AX - B\|_F}{\|B\|_F} = 1.2412\times 10^{-15}$.
 
 \section{Conclusion}
+\iffalse
 {\color{red}We acknowledge that the split quaternion algebra does not constitute an Euclidean space, rendering traditional Givens rotations and Householder reflections inapplicable when applied to split quaternion vectors. This poses a substantial challenge for the conventional QR decomposition process for split quaternion matrices. To address this issue, by performing several permutation transformations on the rows and columns of an upper triangular matrix, we have obtained the permutation equivalence between $R$ and $R_4$: $R = P_mR_4{P_n}^T$. Based on this transformation process, we developed the Algorithm \cref{alg:Permutation}.  By analyzing the impact of the permutation matrix $P_k$ on $R$, we have proposed a more efficient optimization algorithm, Algorithm \cref{alg:Permutation Optimization}. 
 
 Building on these findings, we introduced a special decomposition $A^\sigma = QR_4$. By utilizing the structural mapping between the real representation matrix $A^\sigma$ and the original matrix $A$, we were able to derive the QR decomposition for split quaternion matrices and subsequently propose Algorithm \cref{alg:QR}. This has filled the gap in the theory and algorithms of split quaternion QR decomposition.  Moreover, this method is broadly applicable to various decompositions, including Schur, Jordan, LU, Cholesky, and eigenvalue decompositions, etc.  Therefore, 
 this new approach offers novel technical avenues for the numerical computation of split quaternion matrices.
 
 To validate the effectiveness and superiority of the proposed algorithm, we have applied the algorithm to QR decomposition and solving matrix equation. The experimental results demonstrate that the algorithm exhibits outstanding performance, showing significant advantages in both computational efficiency and accuracy.} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Acknowledgments}
-This research is supported by \iffalse Macao Science and Technology Development Fund (No. 0013/2021/ITP),\fi the grants from \iffalse  the National Natural Science Foundation of China (12371023, 12271338),\fi NSF of China (12371023, 12271338) and \iffalse the Natural Sciences and Engineering Research Council of Canada (NSERC) (RGPIN 2020-06746).\fi Canada NSERC.
+VERSION2:\fi
+In this work, we establish a critical relationship  between $R$ and $R_4$ via performing a series of permutation transformations on the rows and columns of the upper triangular matrix $R$, resulting in $R_4 = P_{2m}R{P_{2n}}^T$. By analyzing the impact of the permutation matrix $P_{2k}$ on $R$, we  propose an efficient optimization algorithm (\cref{alg:Permutation Optimization}), which will transform $R$ to $R_4$ effectively.
 
-{\bf Data availability:} No data was used for the research described in the article.
+Based on these findings, we develop a special decomposition $A^\sigma = QR_4$. By utilizing the structural mapping between the real representation matrix $A^\sigma$ and the original matrix $A$, we were able to derive the QR decomposition for split quaternion matrices and subsequently propose \cref{alg:QR}. Upon application of this algorithm to QR decomposition and the solution of matrix equation, it exhibits outstanding performance, showing significant advantages in both computational efficiency and accuracy.
 
-\section{Declarations}
-{\bf Conflict of Interest:} The authors have not disclosed any competing interests.
+In summary, our work fills the gap in the theory and algorithms of split quaternion QR decomposition. Moreover,  the proposed new method could be used to implement various decompositions, including Schur, and eigenvalue decompositions, etc. In the future work, we will employ this method to investigate the aforementioned topics.
 
-{\bf Data Availability Statement:}
+
+
+
+
+
+
+
+\iffalse
+By leveraging the special decomposition $A^\sigma = QR_4$ and the unique structure of real representations for split quaternion matrices, the QR decomposition of split quaternion matrices was successfully constructed.
+This paper focuses on the problem of QR decomposition for split quaternion matrices, proposing for the first time a research methodology that combines permutation operations with real representation matrices. A QR decomposition theorem suitable for split quaternion matrices is established, and a corresponding QR algorithm is constructed based on it. To validate the effectiveness and superiority of the proposed algorithm, two application examples are provided, with a systematic analysis of the algorithm's computational time consumption and relative error metrics. The experimental results demonstrate that the algorithm exhibits outstanding performance in numerical computations, showing significant advantages in both computational efficiency and accuracy. This provides new theoretical methods and technical approaches for the numerical computation of split quaternion matrices.\fi
+\section*{Acknowledgment} This research is supported by \iffalse Macao Science and Technology Development Fund (No. 0013/2021/ITP),\fi  the grants from the National Natural Science Foundation of China (12371023, 12271338) and the Natural Sciences and Engineering Research Council of Canada (NSERC) (RGPIN 2020-06746). \iffalse The joint research and Development fund of Wuyi University, Hong Kong and Macao (2019WGALH20).\fi
+\iffalse
+{\bf Declaration of Competing Interest:} The authors declare no conflict of interest.
+\\
+
+ \fi
+ \section*{Declarations}
+\noindent {\bf Conflict of Interest:} The authors have not disclosed any competing interests.
+
+\noindent {\bf Data Availability Statement:}
 The data supporting the findings of this study are not publicly available due to privacy or ethical restrictions. However, interested researchers may request access to the data by contacting the corresponding author and completing any necessary data sharing agreements.
+\iffalse
+\section{Acknowledgments}
+This research is supported by Macao Science and Technology Development Fund (No. 0013/2021/ITP),  the grants from the National Natural Science Foundation of China (12371023, 12271338) and the Natural Sciences and Engineering Research Council of Canada (NSERC) (RGPIN 2020-06746).
 
+{\bf Data availability:} No data was used for the research described in the article.\fi
 %-------------------- 参考文献 --------------------
-\parskip=5pt
-\noindent \rule[0pt]{25em}{1pt}
-
-\parskip=10pt
-
-% \renewcommand{\bibname}{}
-
-% \section*{References}
-% \vspace{-8em}
-% \begin{list}{[\arabic{enumi}]}{\usecounter{enumi} %%
-\leftmargin=2em%%%%%%
-% \labelsep=1em%%%%%
-% \renewcommand{\makelabel}[1]{#1 \hfil}}%%
-
-% natbib的用法
 \bibliographystyle{coam/coam} % 参考文献样式
 \bibliography{references} % 文献数据库文件名
+
 
 \end{document}
