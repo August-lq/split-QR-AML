@@ -36,6 +36,16 @@
 \hypersetup{colorlinks=true, citecolor=blue}
 %%%%%% 
 
+\usepackage{cleveref} % 智能引用
+\usepackage{caption} % 用于设置标题格式
+% 设置图片标题前缀为 "Fig."
+\captionsetup[figure]{name=Fig.}
+\captionsetup[algorithm]{name=Algorithm}
+
+% 设置 cleveref 引用前缀
+\crefname{figure}{Fig.}{Figs.} % 单数/复数形式
+\crefname{algorithm}{Algorithm}{Algorithms} % 单数/复数形式
+
 %%%% 编辑临时使用
 \newcommand{\red}{\color{red}}
 
@@ -143,7 +153,7 @@ R_4 = \begin{bmatrix}
     R_{21} & R_{22}
 \end{bmatrix} \in \mathbb{R}^{2m \times 2n},
 \end{equation}
-and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m \times n$. To achieve the special decomposition \eqref{splitqr}, we will first  figure out how to  transform an upper triangular matrix $R$ into $R_4$ (Figure \ref{fig:Figure_1}) through permutation transformations.
+and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m \times n$. To achieve the special decomposition \eqref{splitqr}, we will first  figure out how to  transform an upper triangular matrix $R$ into $R_4$ (\cref{fig:Figure_1}) through permutation transformations.
 \begin{figure}[htbp]
     % \begin{minipage}[htbp]{0.45\textwidth}
         \centering
@@ -505,7 +515,7 @@ By the properties of the row and column transformations, we can check that the r
     P_{m} R P_{n}^T = \begin{bmatrix} R_{11} & R_{12}\\R_{21}& R_{22}\end{bmatrix}.
 \end{equation}
 
-To obtain the matrix $P_k, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, we established Algorithm \ref{alg:Permutation} when the input is $P=I_{2k}$, and obtain the permutation matrix $P_k$:
+To obtain the matrix $P_k, k\in \{m,n\}$ for $R \in \mathbb{R}^{2m \times 2n}$, we established Algorithm \cref{alg:Permutation} when the input is $P=I_{2k}$, and obtain the permutation matrix $P_k$:
 
 \begin{equation}\label{p}
     P_k = \begin{bmatrix} 
@@ -536,9 +546,9 @@ Multiplying both sides of the equation by $P_m$ on the left and $P_n^T$ on the r
 $P_m^TA^\sigma P_n, P_m\widehat{Q}P_m^T, P_m \widehat{R}P_n^T$. 
 
 {\color{red}As we can observe from the form of $P$ and above example, we only need to place the rows (1, 3, 5, 2, 4, 6) of $R$ respectively to the (1, 2, 3, 4, 5, 6) rows of the resulting matrix. Next, perform column operations on the resulting matrix, place the columns (1, 3, 5, 7, 2, 4, 6, 8) of the resulting matrix into the columns (1, 2, 3, 4, 5, 6, 7, 8) respectively to obtain $R_4$.\iffalse This $P_k$ and \eqref{eq:Rn} can also explain why we perform aforesaid operations on $R$. Based on this, we propose an optimized version of Algorithm 1, that is Algorithm 2. By using $R=\text{PermutationOpt}(R,0)$, one can  obtain $R_4$, which satisfies \eqref{eq:Rn}.\fi}
-So to reduce computational cost, we designed Algorithm \ref{alg:Permutation Optimization} to avoid multiplication operations on $A^\sigma, \widehat{Q}, \widehat{R}$.
+So to reduce computational cost, we designed Algorithm \cref{alg:Permutation Optimization} to avoid multiplication operations on $A^\sigma, \widehat{Q}, \widehat{R}$.
 \iffalse
-{\color{red}To reduce computational cost, we designed Algorithm \ref{alg:Permutation Optimization}, which avoids multiplication operations on $A^\sigma, \widehat{R}, \widehat{Q}$.}\fi
+{\color{red}To reduce computational cost, we designed Algorithm \cref{alg:Permutation Optimization}, which avoids multiplication operations on $A^\sigma, \widehat{R}, \widehat{Q}$.}\fi
 
 % \end{multicols}
 \begin{algorithm}[htbp]
@@ -680,16 +690,16 @@ From the process described above, any split quaternion matrix can be decomposed 
     \end{eqnarray}
 \end{theorem}
 % \iffalse
-% To reduce the computational cost, we designed Algorithm \ref{alg:Permutation Optimization}, which avoids multiplication operations on $\widehat{A}, \widehat{R}, \widehat{Q}$.
+% To reduce the computational cost, we designed Algorithm \cref{alg:Permutation Optimization}, which avoids multiplication operations on $\widehat{A}, \widehat{R}, \widehat{Q}$.
 
 \textbf{Complexity Analysis:}
-{Complexity Analysis:} For a split quaternion matrix $A = A_0 + A_1i + A_2j + A_3k \in \mathbb{H}_s^{m \times n}$, the computational complexity of Algorithm \ref{alg:QR} is dominated by three components:  
+{Complexity Analysis:} For a split quaternion matrix $A = A_0 + A_1i + A_2j + A_3k \in \mathbb{H}_s^{m \times n}$, the computational complexity of Algorithm \cref{alg:QR} is dominated by three components:  
 
 \textbf{1. Real Representation Conversion:}
 Constructing the real representation $A^\sigma \in \mathbb{R}^{2m \times 2n}$ requires about $4mn$ flops. 
 
 \textbf{2. Permutations On $A^\sigma, \widehat{Q}, \widehat{R}$:}
-By using Algorithm \ref{alg:Permutation Optimization},  which requires approximately  $(8m+4n)$ flops.
+By using Algorithm \cref{alg:Permutation Optimization},  which requires approximately  $(8m+4n)$ flops.
 
 \textbf{3. Real Matrix QR Decomposition:}
 The QR decomposition of $A^\sigma \in \mathbb{R}^{2m \times 2n}$ using Householder reflections dominates the complexity at $16(mn^2-\frac{n^3}{3})$ flops.
@@ -803,7 +813,7 @@ $$
 
 \section{Numerical Examples}
 \iffalse In this section,  we will use the proposed Algorithm 2 to compute the QR decomposition for split quaternion matrices and apply it to solving a matrix equation.\fi
-In this section, we will use the proposed Algorithm \ref{alg:QR} to compute the QR decomposition for split quaternion matrices.
+In this section, we will use the proposed Algorithm \cref{alg:QR} to compute the QR decomposition for split quaternion matrices.
 \begin{example}
     Given a split quaternion matrix $A = A_{0}+A_{1}i+A_{2}j+A_{3}k\in \mathbb{H}_s^{m\times n}$, where
     \begin{equation}
@@ -817,9 +827,9 @@ In this section, we will use the proposed Algorithm \ref{alg:QR} to compute the 
         \end{cases} \label{eq:example2}
     \end{equation}
 \end{example}
-Here, the MATLAB function $rand(m,n)$ is used to generate a $m \times n$ real matrix with random elements that fall within the interval (0,1).  All experiments were performed and computed using MATLAB 2024a on a system equipped with an 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz processor, 16.0 GB RAM and Windows 11 Pro. We executed Algorithm \ref{alg:QR} to perform the QR decomposition on $A$, and have calculated the CPU time and the relative error
+Here, the MATLAB function $rand(m,n)$ is used to generate a $m \times n$ real matrix with random elements that fall within the interval (0,1).  All experiments were performed and computed using MATLAB 2024a on a system equipped with an 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz processor, 16.0 GB RAM and Windows 11 Pro. We executed Algorithm \cref{alg:QR} to perform the QR decomposition on $A$, and have calculated the CPU time and the relative error
 $\epsilon = \frac{\left\|A - Q R\right\|_{F}}{\|A\|_{F}}.$
-The experimental results from Figure \ref{fig:Figure_2} show that Algorithm \ref{alg:QR} performs quite well in both speed and accuracy. 
+The experimental results from \cref{fig:Figure_2} show that Algorithm \cref{alg:QR} performs quite well in both speed and accuracy. 
 \begin{figure}[H]
     \centering
     \begin{minipage}[b]{0.45\textwidth}
@@ -891,7 +901,7 @@ Utilize the QR algorithm to solve the split quaternion matrix equation $AX = B$,
 \end{align*}
 \end{example}  
 
-First, using Algorithm \ref{alg:QR} to perform QR decomposition on $A$ to obtain $Q$ and $R:$
+First, using Algorithm \cref{alg:QR} to perform QR decomposition on $A$ to obtain $Q$ and $R:$
 \setlength{\jot}{2pt}
 \setlength{\arraycolsep}{1pt}
 % {\footnotesize
@@ -1005,9 +1015,9 @@ Note that $R$ is an upper triangular matrix. Thus, $RX = Q^HB\triangleq \widehat
 And the relative error is $\frac{\|AX - B\|_F}{\|B\|_F} = 1.2412\times 10^{-15}$.
 
 \section{Conclusion}
-{\color{red}We acknowledge that the split quaternion algebra does not constitute an Euclidean space, rendering traditional Givens rotations and Householder reflections inapplicable when applied to split quaternion vectors. This poses a substantial challenge for the conventional QR decomposition process for split quaternion matrices. To address this issue, by performing several permutation transformations on the rows and columns of an upper triangular matrix, we have obtained the permutation equivalence between $R$ and $R_4$: $R = P_mR_4{P_n}^T$. Based on this transformation process, we developed the Algorithm \ref{alg:Permutation}.  By analyzing the impact of the permutation matrix $P_k$ on $R$, we have proposed a more efficient optimization algorithm, Algorithm \ref{alg:Permutation Optimization}. 
+{\color{red}We acknowledge that the split quaternion algebra does not constitute an Euclidean space, rendering traditional Givens rotations and Householder reflections inapplicable when applied to split quaternion vectors. This poses a substantial challenge for the conventional QR decomposition process for split quaternion matrices. To address this issue, by performing several permutation transformations on the rows and columns of an upper triangular matrix, we have obtained the permutation equivalence between $R$ and $R_4$: $R = P_mR_4{P_n}^T$. Based on this transformation process, we developed the Algorithm \cref{alg:Permutation}.  By analyzing the impact of the permutation matrix $P_k$ on $R$, we have proposed a more efficient optimization algorithm, Algorithm \cref{alg:Permutation Optimization}. 
 
-Building on these findings, we introduced a special decomposition $A^\sigma = QR_4$. By utilizing the structural mapping between the real representation matrix $A^\sigma$ and the original matrix $A$, we were able to derive the QR decomposition for split quaternion matrices and subsequently propose Algorithm \ref{alg:QR}. This has filled the gap in the theory and algorithms of split quaternion QR decomposition.  Moreover, this method is broadly applicable to various decompositions, including Schur, Jordan, LU, Cholesky, and eigenvalue decompositions, etc.  Therefore, 
+Building on these findings, we introduced a special decomposition $A^\sigma = QR_4$. By utilizing the structural mapping between the real representation matrix $A^\sigma$ and the original matrix $A$, we were able to derive the QR decomposition for split quaternion matrices and subsequently propose Algorithm \cref{alg:QR}. This has filled the gap in the theory and algorithms of split quaternion QR decomposition.  Moreover, this method is broadly applicable to various decompositions, including Schur, Jordan, LU, Cholesky, and eigenvalue decompositions, etc.  Therefore, 
 this new approach offers novel technical avenues for the numerical computation of split quaternion matrices.
 
 To validate the effectiveness and superiority of the proposed algorithm, we have applied the algorithm to QR decomposition and solving matrix equation. The experimental results demonstrate that the algorithm exhibits outstanding performance, showing significant advantages in both computational efficiency and accuracy.} 

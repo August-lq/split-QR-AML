@@ -1,10 +1,10 @@
 %%
-%% This is file `coma.bst',
+%% This is file `coam.bst',
 %% generated with the docstrip utility.
 %%
 %% The original source files were:
 %%
-%% merlin.mbs  (with options: `ay,nat,nm-rev,ed-rev,jnrlst,nmlm,x3,m3,keyxyr,dt-beg,yr-par,note-yr,jttl-rm,num-xser,jnm-x,btit-rm,bt-rm,isbn,issn,doi,blk-tit,blk-com,com-blank,in-col,pp,ed,abr,xedn,and-xcom,eprint,url,url-blk,nfss,')
+%% merlin.mbs  (with options: `ay,nat,nm-rvx,ed-rev,jnrlst,nmlm,x3,m3,mct-3,mct-x3,keyxyr,dt-beg,yr-par,note-yr,atit-u,jttl-rm,num-xser,jnm-x,btit-rm,bt-rm,isbn,issn,doi,blk-tit,blk-com,com-blank,in-col,pp,ed,abr,xedn,and-xcom,xand,eprint,url,url-blk,nfss,')
 %% ----------------------------------------
 %% ***  ***
 %% 
@@ -170,6 +170,26 @@ FUNCTION {or}
 {   { pop$ #1 }
     'skip$
   if$
+}
+STRINGS {z}
+
+FUNCTION {remove.dots}
+{ 'z :=
+   ""
+   { z empty$ not }
+   { z #1 #2 substring$
+     duplicate$ "\." =
+       { z #3 global.max$ substring$ 'z :=  * }
+       { pop$
+         z #1 #1 substring$
+         z #2 global.max$ substring$ 'z :=
+         duplicate$ "." = 'pop$
+           { * }
+         if$
+       }
+     if$
+   }
+   while$
 }
 FUNCTION {new.block.checkb}
 { empty$
@@ -394,8 +414,9 @@ FUNCTION {format.names}
   numnames 'namesleft :=
     { namesleft #0 > }
     { s nameptr
-      "{vv~}{ll}{, f.}{, jj}"
+      "{vv~}{ll}{ f{}}{ jj}"
       format.name$
+      remove.dots
       bibinfo bibinfo.check
       't :=
       nameptr #1 >
@@ -415,14 +436,12 @@ FUNCTION {format.names}
                 { 't := }
                 { pop$ }
               if$
+              "," *
               t "others" =
                 {
                   " " * bbl.etal *
                 }
-                {
-                  bbl.and
-                  space.word * t *
-                }
+                { " " * t * }
               if$
             }
           if$
@@ -509,9 +528,6 @@ FUNCTION {format.note}
 
 FUNCTION {format.title}
 { title
-  duplicate$ empty$ 'skip$
-    { "t" change.case$ }
-  if$
   "title" bibinfo.check
 }
 FUNCTION {format.full.names}
@@ -1552,4 +1568,4 @@ FUNCTION {end.bib}
 EXECUTE {end.bib}
 %% End of customized bst file
 %%
-%% End of file `coma.bst'.
+%% End of file `coam.bst'.
