@@ -25,7 +25,7 @@ clean:
 
 # mma子目录编译
 
-.PHONY: all clean mma coma pdf bib pdf-sub bib-sub
+.PHONY: all clean mma coam pdf bib pdf bib
 
 # mma子目录编译
 mma:
@@ -34,16 +34,13 @@ mma:
 	$(MAKE) pdf DIR=mma
 	$(MAKE) pdf DIR=mma
 
-# coma子目录编译
-coma:
-# 	$(MAKE) bst DIR=coma FILE=coma.dbj
-	$(MAKE) pdf DIR=coma
-	$(MAKE) bib DIR=coma
-	$(MAKE) pdf DIR=coma
-	$(MAKE) pdf DIR=coma
+# coam子目录编译
+coam:
+	$(MAKE) pdf DIR=coam
+	$(MAKE) bib DIR=coam
+	$(MAKE) pdf DIR=coam
+	$(MAKE) pdf DIR=coam
 
-# coma-bst:
-# 	$(MAKE) bst DIR=coma FILE=coma.dbj
 
 # 子目录PDF编译
 pdf:

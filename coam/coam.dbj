@@ -664,5 +664,5 @@ End of customized bst file
 %------\ans=*(==nfss)-------
 %>>COMPATIBILITY WITH PLAIN TEX:
   }}
-\generate{\file{coma.bst}{\MBopts}}
+\generate{\file{coam.bst}{\MBopts}}
 \endbatchfile
