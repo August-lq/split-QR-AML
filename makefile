@@ -25,7 +25,7 @@ clean:
 
 # mma子目录编译
 
-.PHONY: all clean mma coam pdf bib pdf bib
+.PHONY: all clean mma coam pdf bib pdf bib ppt
 
 # mma子目录编译
 mma:
@@ -41,6 +41,10 @@ coam:
 	$(MAKE) pdf DIR=coam
 	$(MAKE) pdf DIR=coam
 
+
+ppt:
+	$(MAKE) pdf DIR=. FILE=ppt.tex
+	$(MAKE) pdf DIR=. FILE=ppt.tex
 
 # 子目录PDF编译
 pdf:
