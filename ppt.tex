@@ -25,7 +25,7 @@
 \setbeamercolor{frametitle}{bg=}  
 
 \title{Split Quaternion Matrices: An Algorithm for QR Decomposition}
-\author[Liu QQ]{Based on Qianqian Liu et al. (2025)}
+\author[Liu QQ]{Qianqian Liu}
 \institute[MUST]{Macau University of Science and Technology \\ University of Manitoba}
 \date{\today}
 
@@ -70,7 +70,7 @@
     \column{0.45\textwidth}
     \textbf{Key Properties}
     \begin{itemize}
-        \item[$\bullet$] 4-dimensional non-commutative algebra
+        \item[$\bullet$] four-dimensional non-commutative algebra
         \item[$\bullet$] Contains \textbf{zero divisors} (not a Euclidean space)
         \item[$\bullet$] Applications: Quantum mechanics, electromagnetism, signal processing
     \end{itemize}
@@ -85,7 +85,7 @@
         \item[$\bullet$] LDU/SVD decomposition (Wang et al., 2021, 2024)
         \item[$\bullet$] Matrix equations (Si et al., 2024)
         % \vspace{0.5cm}
-        Missing: \textbf{QR decomposition theory \& algorithms}
+        \item[$\bullet$] Missing: \textbf{QR decomposition theory \& algorithms}
     \end{itemize}
     % \end{block}
   \end{columns}
@@ -100,12 +100,17 @@
   
   \begin{alertblock}{Critical Limitation}
     $\mathbb{H}_s$ is not a Euclidean space (due to zero divisors). Thus:
-    - Givens/Householder transformations fail for split quaternion vectors \\
-    - Non-commutativity of multiplication adds further complexity
-  \end{alertblock}
+  \begin{itemize}
+    \item Givens/Householder transformations fail for split quaternion vectors 
+    \item Non-commutativity of multiplication adds further complexity
+  \end{itemize}
+\end{alertblock}
   
   \begin{block}{Our Solution}
-    Use \textbf{real representation} of split quaternion matrices to convert the problem into real matrix decomposition!
+   \begin{itemize}
+    \item Use \textbf{real representation} of split quaternion matrices to convert the problem into real matrix decomposition!
+    \item propose a novel and efficient algorithm for its computation
+   \end{itemize}
   \end{block}
 \end{frame}
 
@@ -164,25 +169,46 @@
 
 \begin{frame}{3.1 Core Idea: Two-Step Decomposition}
   Goal: For $A \in \mathbb{H}_s^{m \times n}$, find unitary $Q \in \mathbb{H}_s^{m \times m}$ and upper triangular $R \in \mathbb{H}_s^{m \times n}$ such that $A = QR$.
-  
+
   \begin{block}{Step 1: Special Real Decomposition}
     Compute $A^\sigma = \tilde{Q} R_4$, where:
-    - $\tilde{Q} \in \mathbb{R}^{2m \times 2m}$: Orthogonal matrix
-    - $R_4 \in \mathbb{R}^{2m \times 2n}$: Block upper triangular:
+   \begin{itemize}
+    \item $\tilde{Q} \in \mathbb{R}^{2m \times 2m}$: Orthogonal matrix\\
+    \item $R_4 \in \mathbb{R}^{2m \times 2n}$: Block upper triangular:
       \[
       R_4 = \begin{bmatrix} R_{11} & R_{12} \\ R_{21} & R_{22} \end{bmatrix}, \quad R_{11},R_{12},R_{21},R_{22} \in \mathbb{R}^{m \times n} \text{ (upper triangular)}
       \]
+   \end{itemize}
   \end{block}
   
   \begin{block}{Step 2: Map Back to Split Quaternions}
     Use inverse mapping (Section 2.2) to construct:
-    - $Q$ from $\tilde{Q}$ (unitary)
-    - $R$ from $R_4$ (upper triangular)
+   \begin{itemize}
+    \item $Q$ from $\tilde{Q}$ (unitary)
+    \item $R$ from $R_4$ (upper triangular)
+   \end{itemize}
     Satisfies: $A = QR$
   \end{block}
+%   \begin{block}{Step 1: Special Real Decomposition}
+%         Construct a special decomposition of the real representation \( A^\sigma \):
+%         \[
+%         A^\sigma = \widetilde{Q} R_4
+%         \]
+%         where \( \widetilde{Q} \in \mathbb{R}^{2m \times 2m} \) is orthogonal, and \( R_4 \) is in the form of 
+% \begin{equation}\label{r4}
+% R_4 = \begin{bmatrix}
+%     R_{11} & R_{12} \\
+%     R_{21} & R_{22}
+% \end{bmatrix} \in \mathbb{R}^{2m \times 2n},
+% \end{equation}
+% and $R_{11}, R_{12},R_{21},R_{22}$ are all upper triangular matrices of size $m \times n$.
+% \end{block}
+% \begin{block}{Step 2: Map Back to Split Quaternions}  
+%          \textbf{Step 2:} Construct split quaternion matrices \( Q \) (unitary) and \( R \) (upper triangular) such that \( A = QR \).
+%  \end{block}
 \end{frame}
 
-\begin{frame}{3.2 How to Get $R_4$? Permutation Transformations}
+\begin{frame}{3.2 Permutation Transformations}
   Convert standard real QR's upper triangular $R$ to $R_4$ via row/column permutations.
   
   \begin{block}{Permutation Matrix $P_{2k}$ ($k=m,n$)}
@@ -197,7 +223,9 @@
     \]
     Swaps even rows/columns with specific odd rows/columns.
   \end{block}
-  
+  \end{frame}
+
+  \begin{frame}{3.2 How to Get $R_4$?}
   \begin{block}{Key Relationship}
     \[
     P_{2m} R P_{2n}^T = \begin{bmatrix} R_{11} & R_{12} \\ R_{21} & R_{22} \end{bmatrix} = R_4
@@ -214,27 +242,32 @@
 
 \begin{frame}{3.3 Proof of QR Decomposition Existence}
   \begin{block}{Theorem 3.1 (QR Decomposition for $\mathbb{H}_s$)}
-    For any $A \in \mathbb{H}_s^{m \times n}$, there exist:
-    - Unitary $Q \in \mathbb{H}_s^{m \times m}$
+    For any $A \in \mathbb{H}_s^{m \times n}$, there exist:\\
+    - Unitary $Q \in \mathbb{H}_s^{m \times m}$\\
     - Upper triangular $R \in \mathbb{H}_s^{m \times n}$
     Such that $A = QR$.
   \end{block}
-  
-  \begin{proof}[Sketch]
-    1. Compute standard QR of $P_{2m}^T A^\sigma P_{2n}$:
+\end{frame}
+\begin{frame}{3.3 Proof of QR Decomposition Existence}
+%   \begin{proof}[Sketch]
+    \begin{enumerate}
+    \item Compute standard QR of $P_{2m}^T A^\sigma P_{2n}$:
        \[
        P_{2m}^T A^\sigma P_{2n} = \hat{Q} \hat{R}
        \]
        ($\hat{Q}$ orthogonal, $\hat{R}$ upper triangular)
-    
-    2. Multiply both sides by $P_{2m}$ (left) and $P_{2n}^T$ (right):
+    \vspace{1em}
+
+    \item Multiply both sides by $P_{2m}$ (left) and $P_{2n}^T$ (right):
        \[
        A^\sigma = P_{2m} \hat{Q} P_{2m}^T \cdot P_{2m} \hat{R} P_{2n}^T = \tilde{Q} R_4
        \]
        ($\tilde{Q} = P_{2m} \hat{Q} P_{2m}^T$ orthogonal, $R_4 = P_{2m} \hat{R} P_{2n}^T$ block upper triangular)
-    
-    3. Map $\tilde{Q} \to Q$ (unitary) and $R_4 \to R$ (upper triangular) via inverse mapping. Then $A^\sigma = Q^\sigma R^\sigma \implies A = QR$.
-  \end{proof}
+    \vspace{1em}
+
+    \item Map $\tilde{Q} \to Q$ (unitary) and $R_4 \to R$ (upper triangular) via inverse mapping. Then $A^\sigma = Q^\sigma R^\sigma \implies A = QR$.
+%   \end{proof}
+    \end{enumerate}
 \end{frame}
 
 % Section 4: Algorithms
@@ -284,7 +317,7 @@
 \end{frame}
 
 \begin{frame}{4.3 Algorithm 3: Split Quaternion QR Decomposition}
-  \begin{block}{Function Split-QR(A)}
+\footnotesize
     Input: $A = A_0 + A_1i + A_2j + A_3k \in \mathbb{H}_s^{m \times n}$ \\
     Output: Unitary $Q$, upper triangular $R$ with $A=QR$
     \begin{enumerate}
@@ -302,24 +335,24 @@
         \end{align*}
         (where $\tilde{Q} = \begin{bmatrix} Q_{11} & Q_{12} \\ Q_{21} & Q_{22} \end{bmatrix}$, $R_4 = \begin{bmatrix} R_{11} & R_{12} \\ R_{21} & R_{22} \end{bmatrix}$)
     \end{enumerate}
-  \end{block}
+%   \end{block}
 \end{frame}
 
 \begin{frame}{4.4 Computational Complexity Analysis}
   For $A \in \mathbb{H}_s^{m \times n}$, total complexity is dominated by real QR:
   
   \begin{columns}[T]
-    \column{0.33\textwidth}
+    \column{0.32\textwidth}
     \begin{block}{1. Real Representation}
       $4mn$ flops
     \end{block}
     
-    \column{0.33\textwidth}
+    \column{0.25\textwidth}
     \begin{block}{2. Optimized Permutation}
       $8m + 4n$ flops
     \end{block}
     
-    \column{0.33\textwidth}
+    \column{0.38\textwidth}
     \begin{block}{3. Real QR Decomposition}
       $16\left(mn^2 - \frac{n^3}{3}\right)$ flops (Householder reflections)
     \end{block}
@@ -340,9 +373,9 @@
 
 \begin{frame}{5.1 Example 4.1: Efficiency \& Accuracy Test}
   \begin{block}{Experiment Setup}
-    - Test matrices: $A = A_0 + A_1i + A_2j + A_3k$, $A_i = \text{rand}(m,n)$ ($0 < A_{i,ij} < 1$)
-    - Sizes: $m,n = 50,100,\dots,1000$
-    - Environment: MATLAB 2024a, Intel i7-1185G7, 16GB RAM, Windows 11
+    - Test matrices: $A = A_0 + A_1i + A_2j + A_3k$, $A_i = \text{rand}(m,n)$ ($0 < A_{i,ij} < 1$)\\
+    - Sizes: $m,n = 50,100,\dots,1000$\\
+    % - Environment: MATLAB 2024a, Intel i7-1185G7, 16GB RAM, Windows 11
     - Metrics: CPU time, relative error $\epsilon = \frac{\|A - QR\|_F}{\|A\|_F}$
   \end{block}
   
@@ -365,13 +398,13 @@
   \end{block}
   
   \begin{block}{Solution Steps}
-    1. Compute QR decomposition of $A$ via Algorithm 3: $A = QR$
-    2. Multiply both sides by $Q^H$ (left): $RX = Q^H B \triangleq \hat{B}$
+    1. Compute QR decomposition of $A$ via Algorithm 3: $A = QR$\\
+    2. Multiply both sides by $Q^H$ (left): $RX = Q^H B \triangleq \hat{B}$\\
     3. Solve upper triangular system $RX = \hat{B}$ via back substitution
   \end{block}
   
   \begin{block}{Result}
-    - Explicit $X$ constructed (see paper for details)
+    - Explicit $X$ constructed (see paper for details)\\
     - Relative error: $\frac{\|AX - B\|_F}{\|B\|_F} = 1.2412 \times 10^{-15}$ (high accuracy)
   \end{block}
 \end{frame}
@@ -384,14 +417,14 @@
 
 \begin{frame}{6.1 Main Contributions}
   \begin{block}{Theoretical Contributions}
-    1. Established the relationship $R_4 = P_{2m} R P_{2n}^T$ via permutations
-    2. Proved existence of QR decomposition for split quaternion matrices (Theorem 3.1)
+    1. Established the relationship $R_4 = P_{2m} R P_{2n}^T$ via permutations\\
+    2. Proved existence of QR decomposition for split quaternion matrices (Theorem 3.1)\\
     3. Filled the gap in split quaternion QR decomposition theory
   \end{block}
   
   \begin{block}{Algorithmic Contributions}
-    1. Proposed optimized permutation algorithm (Algorithm 2) to reduce computational cost
-    2. Developed efficient Split-QR algorithm (Algorithm 3) with complexity $O(mn^2)$
+    1. Proposed optimized permutation algorithm (Algorithm 2) to reduce computational cost\\
+    2. Developed efficient Split-QR algorithm (Algorithm 3) with complexity $O(mn^2)$\\
     3. Validated high efficiency (speed) and accuracy via experiments
   \end{block}
 \end{frame}
@@ -407,7 +440,7 @@
   \end{block}
   
   \begin{block}{Application Expansion}
-    - Solve more complex split quaternion matrix equations (e.g., $AX + XB = C$)
+    - Solve more complex split quaternion matrix equations (e.g., $AX + XB = C$)\\
     - Apply to real-world problems: Electromagnetic field simulation, quantum state estimation
   \end{block}
   
