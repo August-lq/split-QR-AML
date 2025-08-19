@@ -40,17 +40,20 @@
 \providecommand{\BIBand}{and}
 %%%%%% 引用链接，方便引用跳转可以去掉
 \usepackage{hyperref}
-\hypersetup{colorlinks=true, citecolor=blue}
+\hypersetup{
+colorlinks=true, 
+citecolor=blue,
+linkcolor=black}
 %%%%%% 
 
 \usepackage{cleveref} % 智能引用
 
 \usepackage{caption} % 用于设置标题格式
 % 设置图片标题前缀为 "Fig."
-\captionsetup[figure]{name=Figure}
+\captionsetup[figure]{name=Figure}5
 \captionsetup[algorithm]{name=Algorithm}
 
-% 设置 cleveref 引用前缀
+% 设置 cleveref 引用前缀4
 \crefname{figure}{Fig.}{Figs.} % 单数/复数形式
 \crefname{algorithm}{Algorithm}{Algorithms} % 单数/复数形式
 
@@ -124,7 +127,7 @@ In 1849, James Cockle \citep{Cockle1849} introduced the concept of split quatern
 \end{equation*} 
 
  $\mathbb{H}_s$ is a four dimensional non-commutative algebra and contains zero divisors. 
-  In the past decades, many studies have been done on the \iffalse algebraic properties of \fi split quaternions \citep{AR2020,Yasemin2012,TJiang2015,Jiang2018,TJiang2018,Zhuo2020,Yang2020,mma2023,wang2024,Wang2021,Gang2024,yuan2017,Zhang2015} and  many applications have been found in quantum mechanics, electromagnetism, signal processing, etc. \citep{Gog2022, Hasebe2010, Le2022, Z2022, Wang2023}. For instance, \citep{Jiang2018} studied the eigenvalue problem of split quaternion matrices; \iffalse \cite{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \fi \citep{wang2024} solved a classical system of matrix equations; 
+  In the past decades, many studies have been done on the \iffalse algebraic properties of \fi split quaternions \citep{AR2020,Yasemin2012,TJiang2015,Jiang2018,TJiang2018,Zhuo2020,Yang2020,mma2023,wang2024,Wang2021,Gang2024,yuan2017,Zhang2015} and  many applications have been found in quantum mechanics, electromagnetism, signal processing, etc. \citep{Gog2022, Hasebe2010, Z2022, Wang2023}. For instance, \citep{Jiang2018} studied the eigenvalue problem of split quaternion matrices; \iffalse \cite{Xin2019} derived a new real representation of split quaternion matrices to explain the consistency of two types of split quaternion matrix equations \(AX^* - XB = CY + D\) and \(X - AX^*B = CY + D\); \fi \citep{wang2024} solved a classical system of matrix equations; 
  \citep{Wang2021} proposed a fast algorithm for LDU decomposition; \citep{Gang2024} developed an efficient algorithm for the SVD. However, existing research has not yet fully addressed the theoretical development and algorithmic implementation of QR decomposition for split quaternion matrices.
  
 We acknowledge that the split quaternion algebra does not constitute an Euclidean space, rendering traditional Givens rotations and Householder reflections inapplicable when applied to split quaternion vectors. This poses a substantial challenge for the conventional QR decomposition process for split quaternion matrices.
@@ -233,7 +236,7 @@ Second, proceed to perform column permutations on resulting matrix:
 \begin{figure}[htbp]
     % \begin{minipage}[htbp]{0.45\textwidth}
         \centering
-        \includegraphics[width=0.45\textwidth,keepaspectratio=true]{images/Figure_1.png} % Replace with actual file name
+        \includegraphics[width=0.45\textwidth,keepaspectratio=true]{Figure_1.png} % Replace with actual file name
         \caption{From $R$ to $R_4$ by permutations }
         \label{fig:Figure_1}
 \end{figure}
@@ -980,13 +983,13 @@ The experimental results from \cref{fig:Figure_2} show that \cref{alg:QR} perfor
     \centering
     \begin{minipage}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/Figure_2.png} % Replace with actual filename
+        \includegraphics[width=\textwidth]{Figure_2.png} % Replace with actual filename
        % \subcaption{(a)}
     \end{minipage}
     \hfill % Add space
     \begin{minipage}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/Figure_3.png} % Replace with actual filename
+        \includegraphics[width=\textwidth]{Figure_3.png} % Replace with actual filename
         % \subcaption{(b)}
     \end{minipage}
     % \captionsetup{font=footnotesize}
@@ -1209,5 +1212,69 @@ This research is supported by Macao Science and Technology Development Fund (No.
 \bibliographystyle{coam/coam} % 参考文献样式
 \bibliography{references} % 文献数据库文件名
 
+% \begin{thebibliography}{99}
+
+% \bibitem[Abłamowicz,2020]{Abłamowicz2020}Abłamowicz R(2020)The Moore–Penrose inverse and singular value decomposition of split quaternions. Advances in Applied Clifford Algebras 30(3):33
+% % \bibitem[Abłamowicz(2020)]{Abłamowicz2020} R. Abłamowicz, The Moore–Penrose inverse and singular value decomposition of split quaternions, Adv. Appl. Clifford Algebras. 33 (30) (2020) 1–20.
+
+% \bibitem[Alagöz et al.,2012]{Yasemin2012}Alagöz Y, Oral K, Yüce S(2012)Split quaternion matrices. Miskolc Mathematical Notes 13(2):223–232
+% % \bibitem[Yasemin(2012)]{Yasemin2012} Y. Alag\"oz, K. Oral, and S. Y\"uce, Split quaternion matrices, Miskolc Math. Notes 13 (2) (2012) 223–232.
+
+% \bibitem[Cockle,1849]{Cockle1849}Cockle J(1849) LII On systems of algebra involving more than one imaginary; and on equations of the fifth degree. The London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science 35(238):434-437
+% % \bibitem[Cockle(1849)]{Cockle1849} J. Cockle, LII. On systems of algebra involving more than one imaginary; and on equations of the fifth degree, Phil. Mag. 35 (238) (1849) 434–437.
+
+% \bibitem[Gogberashvili,2022]{Gog2022}Gogberashvili M(2022)(2+ 1)-Maxwell equations in split quaternions. Physics 4(1):329-363
+% % \bibitem[Gog(2022)]{Gog2022} M. Gogberashvili, (2+1)-Maxwell equations in split quaternions, Phys. 4 (1) (2022) 329–363.
+
+% \bibitem[Hasebe,2010]{Hasebe2010}Hasebe, K(2010)Split-quaternionic Hopf map, quantum Hall effect, and twistor theory. Physical Review D—Particles, Fields, Gravitation, and Cosmology 81(4):041702
+% % \bibitem[Hasebe(2010)]{Hasebe2010} K. Hasebe, Split quaternionic hopf map, quantum hall effect, and twistor theory, Phys. Rev. D 81 (4) (2010) 041702.
+
+% \bibitem[Jiang et al.,2015]{TJiang2015}Jiang T, Jiang Z, Zhang Z(2015)Algebraic techniques for diagonalization of a split quaternion matrix in split quaternionic mechanics. Journal of Mathematical Physics 56(8):083509
+% % \bibitem[TJiang(2015)]{TJiang2015} T. Jiang, Z. Jiang, Z. Zhang, Algebraic techniques for diagonalization of a split quaternion matrix in split quaternion mechanics, J. Math. Phys. 56 (8) (2015) 083509.
+
+% \bibitem[Jiang et al.,2018]{Jiang2018}Jiang T, Zhang Z, Jiang Z(2018)Algebraic techniques for eigenvalues and eigenvectors of a split quaternion matrix in split quaternionic mechanics. Computer Physics Communications 229:1-7
+% % \bibitem[Jiang(2018)]{Jiang2018} T. Jiang, Z. Zhang, Z. Jiang, Algebraic techniques for eigenvalues and eigenvectors of a split quaternion matrix in split quaternionic mechanics, Comput. Phys. Comm. 229 (2018) 1–7.
+
+% \bibitem[Jiang et al.,2018]{TJiang2018}Jiang T, Zhang Z, Jiang Z(2018)Algebraic techniques for Schrödinger equations in split quaternionic mechanics. Computers Mathematics with Applications 75(7):2217-2222
+% % \bibitem[TJiang(2018)]{TJiang2018} T. Jiang, Z. Zhang, Z. Jiang, Algebraic techniques for Schrödinger equations in split quaternionic mechanics, Comput. Math. Appl. 75 (7) (2018) 2217–2222.
+
+% \bibitem[Legrand,2022]{Le2022}Legrand EB(2022) The geometry of dissipative mechanical systems: Using Jacobi manifolds and the split quaternion algebra. Delft University of Technology
+% % \bibitem[Le(2022)]{Le2022} E. Legrand, The geometry of dissipative mechanical systems: Using Jacobi manifolds and the split quaternion algebra, TU Delft, 2022.
+
+% \bibitem[Liu \& He,2020]{Zhuo2020}Liu X, He ZH(2020)On the split quaternion matrix equation $AX= B$. Banach Journal of Mathematical Analysis 14(1):228-248
+% % \bibitem[Zhuo(2020)]{Zhuo2020} X. Liu, Z. He, On the split quaternion matrix equation $AX= B$, Banach J. Math. Anal. 14 (1) (2020) 228-248.
+
+% \bibitem[Liu \& Zhang,2020]{Yang2020}Liu X, Zhang Y(2020)Least squares \(X = {X^{\eta}}^* \) solutions to split quaternion matrix equation \(AX{A^{\eta}}^*= B\). Mathematical Methods in the Applied Sciences 43(5):2189-2201
+% % \bibitem[Yang(2020)]{Yang2020} X. Liu, Y. Zhang, Least squares \(X = {X^{\eta}}^* \) solutions to split quaternion matrix equation \(AX{A^{\eta}}^*= B\), Math. Meth. Appl. Sci. 43 (5) (2020) 2189-2201.
+
+% \bibitem[Liu \& Zhang,2019]{Xin2019}Liu X, Zhang Y(2019)Consistency of Split Quaternion Matrix Equations $AX^* - XB = CY + D$ and $X - AX^*B = CY + D$. Advances in Applied Clifford Algebras 29(4):64
+% % \bibitem[Xin(2019)]{Xin2019} X. Liu and Y. Zhang. Consistency of Split Quaternion Matrix Equations $AX^* - XB = CY + D$ and $X - AX^*B = CY + D$. Advances in Applied Clifford Algebras 29 (2019) 1-20.
+
+% \bibitem[Özdemir,2022]{Z2022}Özdemir Z(2022)A kinematic model of the Rytov’s law in the optical fiber via split quaternions: application to electromagnetic theory. The European Physical Journal Plus 137(6):651
+% % \bibitem[Z(2022)]{Z2022} Z. Özdemir, A kinematic model of the Rytov’s law in the optical fiber via split quaternions: application to electromagnetic theory, Euro. Phys. J. Plus 137 (6) (2022) 1–13.
+
+% \bibitem[Öztürk \& Özdemir,2023]{mma}Öztürk İ, Özdemir M(2023)On geometric interpretations of split quaternions. Mathematical Methods in the Applied Sciences 46(1):408-422
+% % \bibitem[mma(2023)]{mma} İ. Öztürk, M. Özdemir, On geometric interpretations of split quaternions, Math. Meth. Appl. Sci. 46 (1) (2023) 408-422.
+
+% \bibitem[Si et al.,2024]{wang}Si KW, Wang QW, Xie LM(2024)A classical system of matrix equations over the split quaternion algebra. Advances in Applied Clifford Algebras 34(5):51
+% % \bibitem[wang(2024)]{wang} K.W. Si, Q.W. Wang, L.M. Xie, A classical system of matrix equations over the split quaternion algebra, Adv. Appl. Clifford Algebras. 34 (5) (2024) 51.
+
+% \bibitem[Wang et al.,2023]{Wang2023}Wang G, Jiang T, Vasil’ev VI, Guo Z(2023)An efficient method for Maxwell’s equations with a discrete double-curl operator in split quaternionic electromagnetics. The European Physical Journal Plus 138(4):341
+% % \bibitem[Wang(2023)]{Wang2023} G. Wang, T. Jiang, V.I. Vasil’ev, Z. Guo, An efficient method for Maxwell’s equations with a discrete double-curl operator in split quaternionic electromagnetics, Eur. Phys. J. Plus 341 (138) (2023) 1–6.
+
+% \bibitem[Wang et al.2021]{Wang2021}Wang G, Jiang T, Guo Z, Zhang D(2021)A complex structure-preserving algorithm for split quaternion matrix LDU decomposition in split quaternion mechanics. Calcolo 58(3):34
+% % \bibitem[Wang(2021)]{Wang2021} G. Wang, T. Jiang, Z. Guo, D. Zhang, A complex structure-preserving algorithm for split quaternion matrix LDU decomposition in split quaternion mechanics, Calcolo 58 (34) (2021) 1–15.
+
+% \bibitem[Wang et al.,2024]{Gang2024}Wang G, Jiang T, Vasil’ev VI, Guo Z(2024)On singular value decomposition for split quaternion matrices and applications in split quaternionic mechanics. Journal of Computational and Applied Mathematics 436:115447
+% % \bibitem[Gang(2024)]{Gang2024} G. Wang, T. Jiang, V. Vasil’ev, Z. Guo, On singular value decomposition for split quaternion matrices and applications in split quaternionic mechanics, J. Comput. Appl. Math. 436 (2024) 115447.
+
+% \bibitem[Yuan et al.,2017]{yuan}Yuan SF, Wang QW, Yu YB, Tian Y(2017)On Hermitian solutions of the split quaternion matrix equation $AXB+CXD=E$. Advances in Applied Clifford Algebras 27(4):3235-3252
+% % \bibitem[yuan(2017)]{yuan} S.F. Yuan, Q.W. Wang, Y. Yu, On Hermitian solutions of the split quaternion matrix equation $AXB+CXD=E$, Adv. Appl. Clifford Algebras. 27 (2017) 3235-3252.
+
+% \bibitem[Zhang et al.,2015]{Zhang2015}Zhang Z, Jiang Z, Jiang T(2015)Algebraic methods for least squares problem in split quaternionic mechanics. Applied Mathematics and Computation 269:618-625
+% % \bibitem[Zhang(2015)]{Zhang2015} Z. Zhang, Z. Jiang, T. Jiang, Algebraic methods for least squares problem in split quaternionic mechanics, Appl. Math. Comput. 269 (2015) 618–625.
+
+
+% \end{thebibliography}
 
 \end{document}
